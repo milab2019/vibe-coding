@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MILAB Vibe Coding — 학생 작품 갤러리</title>
+<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0a0a0f; --surface:#13131a; --card:#1a1a24; --border:#2a2a3a;
+  --accent1:#ff6b35; --accent2:#7c3aed; --accent3:#06b6d4;
+  --text:#f0f0f8; --muted:#8888aa;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-serif;min-height:100vh;overflow-x:hidden;}
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:linear-gradient(rgba(124,58,237,0.04) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(124,58,237,0.04) 1px,transparent 1px);
+  background-size:40px 40px;
+}
+
+/* 헤더 */
+header{position:relative;z-index:10;padding:3rem 2rem 2rem;text-align:center;border-bottom:1px solid var(--border);}
+.milab-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.4);
+  border-radius:100px;padding:6px 16px;font-size:12px;color:#a78bfa;
+  letter-spacing:0.1em;text-transform:uppercase;margin-bottom:1.5rem;
+}
+.milab-badge::before{content:'';width:6px;height:6px;background:#a78bfa;border-radius:50%;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.5;transform:scale(0.8);}}
+h1{font-family:'Black Han Sans',sans-serif;font-size:clamp(2rem,6vw,4rem);line-height:1.1;margin-bottom:0.75rem;}
+h1 span.g{
+  background:linear-gradient(135deg,var(--accent1),var(--accent2),var(--accent3));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.subtitle{color:var(--muted);font-size:1rem;margin-bottom:1.5rem;}
+
+/* 필터 */
+.filter-bar{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:1rem;}
+.filter-btn{
+  background:var(--surface);border:1px solid var(--border);border-radius:100px;
+  padding:7px 18px;font-size:13px;color:var(--muted);cursor:pointer;
+  transition:all 0.2s;font-family:'Noto Sans KR',sans-serif;
+}
+.filter-btn:hover,.filter-btn.active{
+  background:rgba(124,58,237,0.2);border-color:rgba(124,58,237,0.6);color:#c4b5fd;
+}
+
+/* 통계 */
+.stats-bar{
+  position:relative;z-index:10;display:flex;gap:2rem;justify-content:center;
+  padding:1.5rem 2rem;border-bottom:1px solid var(--border);flex-wrap:wrap;
+}
+.stat{text-align:center;}
+.stat-num{
+  font-family:'Black Han Sans',sans-serif;font-size:1.8rem;
+  background:linear-gradient(135deg,var(--accent1),var(--accent2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.stat-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;}
+
+/* 로딩 */
+.loading{text-align:center;padding:5rem 2rem;color:var(--muted);position:relative;z-index:10;}
+.spinner{
+  width:40px;height:40px;border:3px solid var(--border);
+  border-top-color:var(--accent2);border-radius:50%;
+  animation:spin 0.8s linear infinite;margin:0 auto 1rem;
+}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* 갤러리 */
+.gallery{position:relative;z-index:10;max-width:1200px;margin:0 auto;padding:2.5rem 1.5rem;}
+.tip-box{
+  background:rgba(6,182,212,0.08);border:1px solid rgba(6,182,212,0.25);
+  border-radius:12px;padding:1rem 1.5rem;color:#67e8f9;
+  font-size:13px;margin-bottom:2rem;line-height:1.9;
+}
+.tip-box strong{color:#22d3ee;}
+.section-title{
+  font-family:'Black Han Sans',sans-serif;font-size:1.1rem;color:var(--muted);
+  margin-bottom:1.5rem;display:flex;align-items:center;gap:12px;
+}
+.section-title::after{content:'';flex:1;height:1px;background:var(--border);}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.25rem;}
+
+/* 카드 */
+.card{
+  background:var(--card);border:1px solid var(--border);border-radius:16px;
+  overflow:hidden;transition:transform 0.25s,border-color 0.25s,box-shadow 0.25s;
+  text-decoration:none;color:inherit;display:block;animation:fadeUp 0.4s ease both;
+}
+.card:hover{
+  transform:translateY(-4px);border-color:rgba(124,58,237,0.5);
+  box-shadow:0 12px 40px rgba(124,58,237,0.15);
+}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+
+.card-banner{
+  height:160px;display:flex;align-items:center;justify-content:center;
+  position:relative;overflow:hidden;
+}
+.c0 .card-banner{background:linear-gradient(135deg,#1a0533,#2d0a6e);}
+.c1 .card-banner{background:linear-gradient(135deg,#1a0a00,#4a1a00);}
+.c2 .card-banner{background:linear-gradient(135deg,#001a1f,#003a4a);}
+.c3 .card-banner{background:linear-gradient(135deg,#001a0a,#003a18);}
+.c4 .card-banner{background:linear-gradient(135deg,#1a001a,#3a0042);}
+
+.card-emoji{font-size:3rem;position:relative;z-index:1;filter:drop-shadow(0 0 20px rgba(255,255,255,0.3));}
+.badge-new{
+  position:absolute;top:12px;right:12px;background:var(--accent1);
+  color:white;font-size:10px;font-weight:700;padding:3px 8px;
+  border-radius:100px;letter-spacing:0.08em;z-index:2;
+}
+.card-body{padding:1rem 1.25rem 1.25rem;}
+.card-school{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;}
+.card-name{font-family:'Black Han Sans',sans-serif;font-size:1.2rem;margin-bottom:8px;}
+.card-meta{display:flex;align-items:center;justify-content:space-between;}
+.card-tag{font-size:11px;padding:3px 10px;border-radius:100px;border:1px solid var(--border);color:var(--muted);}
+.card-arrow{
+  width:28px;height:28px;border-radius:50%;
+  background:rgba(124,58,237,0.2);border:1px solid rgba(124,58,237,0.4);
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;color:#a78bfa;transition:background 0.2s;
+}
+.card:hover .card-arrow{background:rgba(124,58,237,0.5);}
+
+/* 에러 / 빈 상태 */
+.error-box{
+  background:rgba(255,107,53,0.1);border:1px solid rgba(255,107,53,0.3);
+  border-radius:12px;padding:2rem;text-align:center;color:var(--accent1);
+  margin:2rem auto;max-width:480px;
+}
+.empty-state{text-align:center;padding:4rem 2rem;color:var(--muted);}
+.empty-state p:first-child{font-size:3rem;margin-bottom:1rem;}
+
+footer{
+  position:relative;z-index:10;text-align:center;
+  padding:2rem;border-top:1px solid var(--border);color:var(--muted);font-size:12px;
+}
+footer a{color:#a78bfa;text-decoration:none;}
+footer a:hover{text-decoration:underline;}
+
+@media(max-width:600px){
+  header{padding:2rem 1rem 1.5rem;}
+  .stats-bar{gap:1.5rem;}
+  .gallery{padding:1.5rem 1rem;}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="milab-badge">MILAB Vibe Coding</div>
+  <h1>학생 <span class="g">작품 갤러리</span></h1>
+  <p class="subtitle">AI로 만든 나만의 앱 — 미랩 앱개발 체험 결과물</p>
+  <div class="filter-bar" id="filter-bar">
+    <button class="filter-btn active" onclick="filterCards('all',this)">전체</button>
+  </div>
+</header>
+
+<div class="stats-bar">
+  <div class="stat"><div class="stat-num" id="stat-total">-</div><div class="stat-label">총 작품 수</div></div>
+  <div class="stat"><div class="stat-num" id="stat-event">-</div><div class="stat-label">참여 행사</div></div>
+  <div class="stat"><div class="stat-num" id="stat-school">-</div><div class="stat-label">참여 학교</div></div>
+</div>
+
+<div id="loading" class="loading">
+  <div class="spinner"></div>
+  <p>작품을 불러오는 중...</p>
+</div>
+
+<main class="gallery" id="gallery" style="display:none;">
+  <div class="tip-box">
+    📁 파일명 규칙: <strong>학교명_학생이름.html</strong> 형태로 저장하면 자동으로 갤러리에 표시됩니다.<br>
+    예시: <strong>삼선중_홍길동.html</strong> &nbsp;/&nbsp; <strong>안성중_김민준.html</strong><br>
+    <span style="color:#a78bfa;font-size:12px;">※ sample · test · README · index 파일은 자동으로 제외됩니다.</span>
+  </div>
+  <div id="gallery-container"></div>
+</main>
+
+<footer>
+  <p>© 2026 <a href="https://milab2019.github.io/main/milab_portfolio.html" target="_blank">MILAB 미랩</a> — 충주 기반 4차산업 진로체험 교육기관</p>
+</footer>
+
+<script>
+const GITHUB_USER = "milab2019";
+const GITHUB_REPO = "vibe-coding";
+const BASE_URL    = `https://${GITHUB_USER}.github.io/${GITHUB_REPO}/`;
+const API_BASE    = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/`;
+
+// 갤러리에서 제외할 파일명 패턴
+const SKIP = /^(sample|test|readme|index)/i;
+
+const EMOJIS = ["🚀","🎮","🎨","🌟","🦁","🐬","🎵","🌈","⚡","🔥","🎯","💡","🏆","🦋","🌺","🍀","🎪","🐧","🦊","🎭"];
+const COLORS = ["c0","c1","c2","c3","c4"];
+
+let allWorks   = [];
+let allEvents  = [];
+let currentFilter = "all";
+
+/* ── 파일명 파싱: 학교_이름.html ── */
+function parseName(filename) {
+  const base = filename.replace(/\.html$/i, "");
+  const idx  = base.indexOf("_");
+  if (idx > 0) {
+    return { school: base.slice(0, idx), name: base.slice(idx + 1) };
+  }
+  return { school: "미확인", name: base };
+}
+
+/* ── GitHub API 호출 ── */
+async function apiFetch(path) {
+  const res = await fetch(API_BASE + path);
+  if (!res.ok) throw new Error(`API 오류: ${res.status}`);
+  return res.json();
+}
+
+/* ── 전체 로드 ── */
+async function loadGallery() {
+  try {
+    const root = await apiFetch("");
+    const folders = root.filter(i => i.type === "dir" && !SKIP.test(i.name));
+
+    if (folders.length === 0) {
+      showError("행사 폴더가 없습니다.<br>GitHub에 폴더를 추가해보세요!");
+      return;
+    }
+
+    allWorks  = [];
+    allEvents = [];
+
+    // 각 폴더 병렬 로드
+    await Promise.all(folders.map(async (folder, fi) => {
+      allEvents.push(folder.name);
+      const files = await apiFetch(encodeURIComponent(folder.name));
+      const htmlFiles = files.filter(
+        f => f.type === "file" && /\.html$/i.test(f.name) && !SKIP.test(f.name)
+      );
+      htmlFiles.forEach((file, i) => {
+        const { school, name } = parseName(file.name);
+        const globalIdx = fi * 20 + i;
+        allWorks.push({
+          name,
+          school,
+          event : folder.name,
+          path  : `${folder.name}/${file.name}`,
+          emoji : EMOJIS[globalIdx % EMOJIS.length],
+          color : COLORS[i % COLORS.length],
+          isNew : false  // 마지막 3개 NEW 처리는 렌더 시점에
+        });
+      });
+    }));
+
+    // 최신 폴더 기준 마지막 3개 NEW 표시
+    if (allWorks.length > 0) {
+      const lastEvent = allEvents[allEvents.length - 1];
+      const sameEvent = allWorks.filter(w => w.event === lastEvent);
+      sameEvent.slice(-3).forEach(w => w.isNew = true);
+    }
+
+    buildFilters();
+    renderGallery("all");
+
+    document.getElementById("loading").style.display = "none";
+    document.getElementById("gallery").style.display = "block";
+
+  } catch (err) {
+    showError(err.message + "<br><br><span style='font-size:12px;opacity:0.7'>GitHub Pages 배포 여부와 저장소 공개 설정을 확인해주세요.</span>");
+  }
+}
+
+/* ── 필터 버튼 생성 ── */
+function buildFilters() {
+  const bar = document.getElementById("filter-bar");
+  allEvents.forEach(ev => {
+    const btn = document.createElement("button");
+    btn.className = "filter-btn";
+    btn.textContent = ev;
+    btn.onclick = () => filterCards(ev, btn);
+    bar.appendChild(btn);
+  });
+}
+
+function filterCards(filter, btn) {
+  currentFilter = filter;
+  document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+  renderGallery(filter);
+}
+
+/* ── 갤러리 렌더링 ── */
+function renderGallery(filter) {
+  const filtered = filter === "all"
+    ? allWorks
+    : allWorks.filter(w => w.event === filter);
+
+  const container = document.getElementById("gallery-container");
+
+  if (filtered.length === 0) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <p>📭</p>
+        <p>아직 작품이 없습니다</p>
+      </div>`;
+    updateStats(filtered);
+    return;
+  }
+
+  // 행사별 그룹핑
+  const groups = {};
+  filtered.forEach(w => {
+    if (!groups[w.event]) groups[w.event] = [];
+    groups[w.event].push(w);
+  });
+
+  let html = "";
+  Object.entries(groups).forEach(([event, items]) => {
+    html += `<div class="section-title">${event}&nbsp;·&nbsp;${items.length}개 작품</div>`;
+    html += `<div class="grid" style="margin-bottom:2.5rem;">`;
+    items.forEach((w, i) => {
+      const delay = (i * 0.06).toFixed(2);
+      html += `
+        <a class="card ${w.color}"
+           href="${BASE_URL}${w.path}"
+           target="_blank"
+           style="animation-delay:${delay}s">
+          <div class="card-banner">
+            <span class="card-emoji">${w.emoji}</span>
+            ${w.isNew ? '<span class="badge-new">NEW</span>' : ''}
+          </div>
+          <div class="card-body">
+            <div class="card-school">${w.school}</div>
+            <div class="card-name">${w.name}</div>
+            <div class="card-meta">
+              <span class="card-tag">앱개발 체험</span>
+              <span class="card-arrow">→</span>
+            </div>
+          </div>
+        </a>`;
+    });
+    html += `</div>`;
+  });
+
+  container.innerHTML = html;
+  updateStats(filtered);
+}
+
+/* ── 통계 업데이트 ── */
+function updateStats(filtered) {
+  document.getElementById("stat-total").textContent  = filtered.length;
+  document.getElementById("stat-event").textContent  = new Set(filtered.map(w => w.event)).size;
+  document.getElementById("stat-school").textContent = new Set(filtered.map(w => w.school)).size;
+}
+
+/* ── 에러 표시 ── */
+function showError(msg) {
+  document.getElementById("loading").innerHTML = `
+    <div class="error-box">
+      <p style="font-size:2rem;margin-bottom:12px;">⚠️</p>
+      <p>${msg}</p>
+    </div>`;
+}
+
+loadGallery();
+</script>
+</body>
+</html>
