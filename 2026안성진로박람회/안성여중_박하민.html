@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>해리포터 퀴즈 🪄</title>
+
+<style>
+
+    body {
+
+        font-family: "Arial", sans-serif;
+
+        background: #f5f7ff;
+
+        margin: 0;
+
+        padding: 0;
+
+        display: flex;
+
+        justify-content: center;
+
+    }
+
+    .container {
+
+        max-width: 420px;
+
+        width: 100%;
+
+        padding: 20px;
+
+    }
+
+    h1 {
+
+        text-align: center;
+
+    }
+
+    .mascot {
+
+        text-align: center;
+
+        font-size: 40px;
+
+        margin-bottom: 10px;
+
+    }
+
+    .question {
+
+        font-size: 18px;
+
+        margin-bottom: 15px;
+
+    }
+
+    .choices button {
+
+        width: 100%;
+
+        padding: 12px;
+
+        margin-bottom: 10px;
+
+        border: none;
+
+        border-radius: 10px;
+
+        background: #e0e7ff;
+
+        font-size: 16px;
+
+    }
+
+    .correct {
+
+        background: #a7f3d0 !important;
+
+    }
+
+    .wrong {
+
+        background: #fecaca !important;
+
+    }
+
+    .explanation {
+
+        margin-top: 10px;
+
+        font-size: 14px;
+
+        color: #555;
+
+    }
+
+    .next-btn {
+
+        margin-top: 15px;
+
+        width: 100%;
+
+        padding: 10px;
+
+        border: none;
+
+        border-radius: 10px;
+
+        background: #6366f1;
+
+        color: white;
+
+        font-size: 16px;
+
+    }
+
+    .result {
+
+        text-align: center;
+
+        font-size: 20px;
+
+    }
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="mascot">🧙‍♂️✨</div>
+
+    <h1>해리포터 퀴즈</h1>
+
+    <div id="quiz"></div>
+
+</div>
+
+
+
+<script>
+
+const quizData = [
+
+    {
+
+        question: "해리포터가 속한 기숙사는?",
+
+        choices: ["슬리데린", "그리핀도르", "래번클로", "후플푸프"],
+
+        answer: 1,
+
+        explanation: "해리는 용감함을 상징하는 그리핀도르입니다!"
+
+    },
+
+    {
+
+        question: "해리의 부엉이 이름은?",
+
+        choices: ["헤드윅", "크룩생크스", "스캐버스", "팡"],
+
+        answer: 0,
+
+        explanation: "헤드윅은 해리의 충실한 부엉이입니다."
+
+    },
+
+    {
+
+        question: "볼드모트의 본명은?",
+
+        choices: ["톰 리들", "세베루스 스네이프", "루시우스 말포이", "시리우스 블랙"],
+
+        answer: 0,
+
+        explanation: "톰 마볼로 리들이 볼드모트입니다."
+
+    },
+
+    {
+
+        question: "호그와트의 교장은?",
+
+        choices: ["덤블도어", "스네이프", "맥고나걸", "루핀"],
+
+        answer: 0,
+
+        explanation: "알버스 덤블도어가 교장입니다."
+
+    },
+
+    {
+
+        question: "마법사 학교 이름은?",
+
+        choices: ["보바통", "덤스트랭", "호그와트", "일버르모니"],
+
+        answer: 2,
+
+        explanation: "주인공들이 다니는 학교는 호그와트입니다."
+
+    },
+
+    {
+
+        question: "헤르미온느의 특징은?",
+
+        choices: ["용감함", "지능", "힘", "속도"],
+
+        answer: 1,
+
+        explanation: "헤르미온느는 뛰어난 지능으로 유명합니다."
+
+    },
+
+    {
+
+        question: "퀴디치에서 사용하는 공이 아닌 것은?",
+
+        choices: ["골든 스니치", "블러저", "퀘이플", "드래곤볼"],
+
+        answer: 3,
+
+        explanation: "드래곤볼은 다른 작품입니다!"
+
+    },
+
+    {
+
+        question: "해리의 상처 위치는?",
+
+        choices: ["손", "이마", "팔", "등"],
+
+        answer: 1,
+
+        explanation: "번개 모양 상처는 이마에 있습니다."
+
+    },
+
+    {
+
+        question: "론 위즐리의 머리색은?",
+
+        choices: ["금발", "검정", "빨강", "갈색"],
+
+        answer: 2,
+
+        explanation: "위즐리 가족은 붉은 머리입니다."
+
+    },
+
+    {
+
+        question: "죽음의 성물 중 하나는?",
+
+        choices: ["투명망토", "지팡이", "반지", "책"],
+
+        answer: 0,
+
+        explanation: "투명망토는 중요한 성물입니다."
+
+    },
+
+    {
+
+        question: "디멘터의 특징은?",
+
+        choices: ["웃음", "행복 전달", "영혼 흡수", "불"],
+
+        answer: 2,
+
+        explanation: "디멘터는 영혼과 행복을 빨아들입니다."
+
+    },
+
+    {
+
+        question: "해리의 절친은?",
+
+        choices: ["드레이코", "론", "네빌", "루나"],
+
+        answer: 1,
+
+        explanation: "론은 해리의 가장 친한 친구입니다."
+
+    }
+
+];
+
+
+
+let current = 0;
+
+let score = 0;
+
+
+
+const quiz = document.getElementById("quiz");
+
+
+
+function loadQuestion() {
+
+    const q = quizData[current];
+
+    quiz.innerHTML = `
+
+        <div class="question">${current + 1}. ${q.question}</div>
+
+        <div class="choices">
+
+            ${q.choices.map((c, i) => `<button onclick="selectAnswer(${i})">${c}</button>`).join("")}
+
+        </div>
+
+        <div class="explanation" id="explanation"></div>
+
+    `;
+
+}
+
+
+
+function selectAnswer(i) {
+
+    const buttons = document.querySelectorAll("button");
+
+    const correct = quizData[current].answer;
+
+
+
+    buttons.forEach((btn, idx) => {
+
+        if (idx === correct) btn.classList.add("correct");
+
+        else if (idx === i) btn.classList.add("wrong");
+
+        btn.disabled = true;
+
+    });
+
+
+
+    if (i === correct) score++;
+
+
+
+    document.getElementById("explanation").innerText = quizData[current].explanation;
+
+
+
+    const nextBtn = document.createElement("button");
+
+    nextBtn.innerText = "다음 ➡️";
+
+    nextBtn.className = "next-btn";
+
+    nextBtn.onclick = nextQuestion;
+
+    quiz.appendChild(nextBtn);
+
+}
+
+
+
+function nextQuestion() {
+
+    current++;
+
+    if (current < quizData.length) {
+
+        loadQuestion();
+
+    } else {
+
+        showResult();
+
+    }
+
+}
+
+
+
+function showResult() {
+
+    quiz.innerHTML = `
+
+        <div class="result">
+
+            🏆 점수: ${score} / ${quizData.length}<br><br>
+
+            ✨ 수고했어!
+
+        </div>
+
+    `;
+
+}
+
+
+
+loadQuestion();
+
+</script>
+
+</body>
+
+</html>
