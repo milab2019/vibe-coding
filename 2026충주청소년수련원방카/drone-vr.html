@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<title>드론 조종사 VR 체험 | MILAB</title>
+
+<!-- OG Tags for QR share -->
+<meta property="og:title" content="드론 조종사 VR 진로체험">
+<meta property="og:description" content="스마트폰으로 드론 조종사를 체험해보세요! MILAB 진로체험">
+<meta property="og:type" content="website">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aframe/1.4.2/aframe.min.js"></script>
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Noto+Sans+KR:wght@300;400;700&display=swap');
+
+  *{margin:0;padding:0;box-sizing:border-box}
+
+  #splash{
+    position:fixed;inset:0;z-index:9999;
+    background:linear-gradient(135deg,#0a0e1a 0%,#0d1f3c 40%,#071428 100%);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    font-family:'Noto Sans KR',sans-serif;
+  }
+  .splash-grid{
+    position:absolute;inset:0;
+    background-image:linear-gradient(rgba(0,180,255,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(0,180,255,.08) 1px,transparent 1px);
+    background-size:40px 40px;
+    animation:gridMove 8s linear infinite;
+  }
+  @keyframes gridMove{from{background-position:0 0}to{background-position:0 40px}}
+
+  .splash-drone{
+    width:160px;height:160px;margin-bottom:2rem;position:relative;z-index:1;
+    animation:dronePulse 2s ease-in-out infinite;
+  }
+  @keyframes dronePulse{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-12px) scale(1.03)}}
+
+  .splash-title{
+    font-family:'Orbitron',monospace;font-size:clamp(1.4rem,5vw,2.2rem);font-weight:900;
+    color:#fff;letter-spacing:.08em;text-align:center;position:relative;z-index:1;
+    text-shadow:0 0 30px rgba(0,200,255,.6);
+  }
+  .splash-sub{
+    font-size:.9rem;color:rgba(0,200,255,.8);margin:.6rem 0 2.5rem;
+    letter-spacing:.15em;text-transform:uppercase;position:relative;z-index:1;
+  }
+  .splash-badge{
+    display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-bottom:2.5rem;
+    position:relative;z-index:1;
+  }
+  .badge{
+    background:rgba(0,180,255,.15);border:1px solid rgba(0,180,255,.4);
+    color:rgba(200,240,255,.85);font-size:.72rem;padding:4px 12px;
+    border-radius:20px;letter-spacing:.05em;
+  }
+  #startBtn{
+    position:relative;z-index:1;
+    background:linear-gradient(135deg,#0080ff,#00d4ff);
+    border:none;color:#fff;font-family:'Orbitron',monospace;font-size:1rem;font-weight:700;
+    padding:16px 48px;border-radius:50px;cursor:pointer;letter-spacing:.1em;
+    box-shadow:0 0 40px rgba(0,150,255,.5);
+    transition:all .2s;
+  }
+  #startBtn:hover{transform:scale(1.05);box-shadow:0 0 60px rgba(0,150,255,.7)}
+  #startBtn:active{transform:scale(.97)}
+
+  #landscape-warn{
+    position:fixed;inset:0;z-index:9998;
+    background:#0a0e1a;display:none;flex-direction:column;
+    align-items:center;justify-content:center;color:#fff;font-family:'Noto Sans KR',sans-serif;text-align:center;gap:1rem;
+  }
+  .rotate-icon{font-size:3rem;animation:rotateAnim 1.5s ease-in-out infinite alternate}
+  @keyframes rotateAnim{from{transform:rotate(-20deg)}to{transform:rotate(20deg)}}
+
+  #ui-overlay{
+    position:fixed;inset:0;z-index:100;pointer-events:none;
+    font-family:'Noto Sans KR',sans-serif;
+  }
+  #hud-top{
+    position:absolute;top:16px;left:50%;transform:translateX(-50%);
+    background:rgba(0,10,30,.75);border:1px solid rgba(0,200,255,.35);
+    border-radius:30px;padding:8px 24px;display:flex;align-items:center;gap:16px;
+    backdrop-filter:blur(8px);pointer-events:auto;
+  }
+  .hud-mission{color:rgba(0,200,255,.9);font-size:.75rem;letter-spacing:.1em;text-transform:uppercase}
+  .hud-score{color:#fff;font-family:'Orbitron',monospace;font-size:.9rem;font-weight:700}
+
+  #info-panel{
+    position:absolute;bottom:80px;left:50%;transform:translateX(-50%);
+    background:rgba(0,10,30,.88);border:1px solid rgba(0,200,255,.4);
+    border-radius:16px;padding:16px 20px;max-width:320px;width:90%;
+    backdrop-filter:blur(12px);display:none;pointer-events:auto;
+  }
+  .info-tag{font-size:.65rem;color:rgba(0,200,255,.8);letter-spacing:.12em;text-transform:uppercase;margin-bottom:4px}
+  .info-title{font-size:1rem;font-weight:700;color:#fff;margin-bottom:6px}
+  .info-desc{font-size:.8rem;color:rgba(200,220,240,.8);line-height:1.6}
+
+  #mission-banner{
+    position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+    text-align:center;display:none;pointer-events:none;
+  }
+  .mission-title{font-family:'Orbitron',monospace;font-size:clamp(1.2rem,4vw,2rem);color:#00d4ff;font-weight:900;
+    text-shadow:0 0 30px rgba(0,212,255,.8);letter-spacing:.05em;
+    animation:missionIn .5s ease-out;
+  }
+  .mission-sub{font-size:.85rem;color:rgba(200,220,255,.8);margin-top:8px;
+    animation:missionIn .5s ease-out .1s both;
+  }
+  @keyframes missionIn{from{opacity:0;transform:scale(.8)}to{opacity:1;transform:scale(1)}}
+
+  #vr-btn{
+    position:absolute;bottom:16px;right:16px;pointer-events:auto;
+    background:rgba(0,10,30,.8);border:1px solid rgba(0,200,255,.4);
+    color:rgba(0,200,255,.9);font-size:.7rem;padding:8px 14px;border-radius:20px;cursor:pointer;
+    font-family:'Noto Sans KR',sans-serif;
+  }
+  #reset-btn{
+    position:absolute;bottom:16px;left:16px;pointer-events:auto;
+    background:rgba(0,10,30,.8);border:1px solid rgba(255,100,100,.4);
+    color:rgba(255,150,150,.9);font-size:.7rem;padding:8px 14px;border-radius:20px;cursor:pointer;
+    font-family:'Noto Sans KR',sans-serif;display:none;
+  }
+  #progress{
+    position:absolute;bottom:60px;right:16px;pointer-events:auto;
+    display:flex;gap:6px;
+  }
+  .prog-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.2);transition:background .3s}
+  .prog-dot.done{background:#00d4ff;box-shadow:0 0 8px #00d4ff}
+  .prog-dot.active{background:#fff;box-shadow:0 0 8px #fff}
+
+  #cert-screen{
+    position:fixed;inset:0;z-index:9997;
+    background:linear-gradient(135deg,#0a0e1a,#071428);
+    display:none;flex-direction:column;align-items:center;justify-content:center;
+    font-family:'Noto Sans KR',sans-serif;
+    animation:fadeIn .8s ease;
+  }
+  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+  .cert-card{
+    background:linear-gradient(135deg,#0d1f3c,#0a1628);
+    border:2px solid rgba(0,200,255,.5);border-radius:20px;
+    padding:2rem 2.5rem;text-align:center;max-width:340px;width:90%;
+    box-shadow:0 0 60px rgba(0,150,255,.3);
+    position:relative;overflow:hidden;
+  }
+  .cert-card::before{
+    content:'';position:absolute;inset:0;
+    background:repeating-linear-gradient(45deg,transparent,transparent 10px,rgba(0,200,255,.02) 10px,rgba(0,200,255,.02) 11px);
+  }
+  .cert-icon{font-size:3rem;margin-bottom:.5rem}
+  .cert-label{font-size:.65rem;color:rgba(0,200,255,.7);letter-spacing:.2em;text-transform:uppercase;margin-bottom:.5rem}
+  .cert-name{font-family:'Orbitron',monospace;font-size:1.3rem;font-weight:900;color:#fff;margin-bottom:.3rem}
+  .cert-sub{font-size:.8rem;color:rgba(200,220,255,.7);line-height:1.6;margin-bottom:1.2rem}
+  .cert-score{font-family:'Orbitron',monospace;font-size:2rem;color:#00d4ff;font-weight:700;
+    text-shadow:0 0 20px rgba(0,212,255,.6);}
+  .cert-score-label{font-size:.7rem;color:rgba(200,220,255,.6);margin-bottom:1.5rem}
+  .cert-btn{
+    background:linear-gradient(135deg,#0080ff,#00d4ff);border:none;
+    color:#fff;font-family:'Orbitron',monospace;font-size:.8rem;font-weight:700;
+    padding:12px 32px;border-radius:30px;cursor:pointer;letter-spacing:.08em;
+  }
+  .stars{display:flex;justify-content:center;gap:8px;margin:1rem 0;font-size:1.5rem}
+</style>
+</head>
+<body>
+
+<!-- 시작 스플래시 -->
+<div id="splash">
+  <div class="splash-grid"></div>
+  <svg class="splash-drone" viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg">
+    <!-- 드론 본체 -->
+    <rect x="60" y="68" width="40" height="24" rx="6" fill="#1a3a6e" stroke="#00d4ff" stroke-width="1.5"/>
+    <rect x="71" y="72" width="18" height="12" rx="3" fill="#0a1f40" stroke="#0080ff" stroke-width="1"/>
+    <!-- 카메라 -->
+    <circle cx="80" cy="86" r="4" fill="#00d4ff" opacity=".6"/>
+    <!-- 암 4개 -->
+    <line x1="60" y1="72" x2="35" y2="52" stroke="#2a5a9e" stroke-width="3" stroke-linecap="round"/>
+    <line x1="100" y1="72" x2="125" y2="52" stroke="#2a5a9e" stroke-width="3" stroke-linecap="round"/>
+    <line x1="60" y1="88" x2="35" y2="108" stroke="#2a5a9e" stroke-width="3" stroke-linecap="round"/>
+    <line x1="100" y1="88" x2="125" y2="108" stroke="#2a5a9e" stroke-width="3" stroke-linecap="round"/>
+    <!-- 모터+프로펠러 -->
+    <circle cx="35" cy="52" r="7" fill="#1a3a6e" stroke="#00d4ff" stroke-width="1.5"/>
+    <ellipse cx="35" cy="52" rx="16" ry="3" fill="rgba(0,212,255,.25)" stroke="#00d4ff" stroke-width=".5"/>
+    <circle cx="125" cy="52" r="7" fill="#1a3a6e" stroke="#00d4ff" stroke-width="1.5"/>
+    <ellipse cx="125" cy="52" rx="16" ry="3" fill="rgba(0,212,255,.25)" stroke="#00d4ff" stroke-width=".5"/>
+    <circle cx="35" cy="108" r="7" fill="#1a3a6e" stroke="#00d4ff" stroke-width="1.5"/>
+    <ellipse cx="35" cy="108" rx="16" ry="3" fill="rgba(0,212,255,.25)" stroke="#00d4ff" stroke-width=".5"/>
+    <circle cx="125" cy="108" r="7" fill="#1a3a6e" stroke="#00d4ff" stroke-width="1.5"/>
+    <ellipse cx="125" cy="108" rx="16" ry="3" fill="rgba(0,212,255,.25)" stroke="#00d4ff" stroke-width=".5"/>
+    <!-- LED -->
+    <circle cx="35" cy="52" r="2.5" fill="#00ff88" opacity=".9"/>
+    <circle cx="125" cy="52" r="2.5" fill="#ff4444" opacity=".9"/>
+    <circle cx="35" cy="108" r="2.5" fill="#00ff88" opacity=".9"/>
+    <circle cx="125" cy="108" r="2.5" fill="#ff4444" opacity=".9"/>
+    <!-- 스캔 라인 애니메이션 -->
+    <rect x="60" y="68" width="40" height="3" fill="rgba(0,212,255,.4)" rx="1">
+      <animateTransform attributeName="transform" type="translate" values="0,0;0,24;0,0" dur="2s" repeatCount="indefinite"/>
+    </rect>
+  </svg>
+
+  <div class="splash-title">드론 조종사<br>VR 진로체험</div>
+  <div class="splash-sub">MILAB · Drone Pilot Experience</div>
+  <div class="splash-badge">
+    <span class="badge">🥽 카드보드 HMD</span>
+    <span class="badge">📱 스마트폰</span>
+    <span class="badge">🚁 3단계 미션</span>
+  </div>
+  <button id="startBtn" onclick="startVR()">▶ 체험 시작</button>
+</div>
+
+<!-- 가로모드 경고 -->
+<div id="landscape-warn">
+  <div class="rotate-icon">📱</div>
+  <div style="font-size:1rem;font-weight:700">가로 모드로 회전해주세요</div>
+  <div style="font-size:.8rem;color:rgba(255,255,255,.6)">HMD 체험을 위해 스마트폰을 가로로 돌려주세요</div>
+</div>
+
+<!-- UI 오버레이 -->
+<div id="ui-overlay" style="display:none">
+  <div id="hud-top">
+    <div class="hud-mission" id="hud-mission-text">미션 1 — 드론 부품 점검</div>
+    <div class="hud-score">⭐ <span id="score-num">0</span></div>
+  </div>
+
+  <div id="mission-banner">
+    <div class="mission-title" id="banner-title"></div>
+    <div class="mission-sub" id="banner-sub"></div>
+  </div>
+
+  <div id="info-panel">
+    <div class="info-tag" id="info-tag"></div>
+    <div class="info-title" id="info-title"></div>
+    <div class="info-desc" id="info-desc"></div>
+  </div>
+
+  <div id="progress">
+    <div class="prog-dot active" id="dot0"></div>
+    <div class="prog-dot" id="dot1"></div>
+    <div class="prog-dot" id="dot2"></div>
+  </div>
+
+  <button id="vr-btn" onclick="toggleVR()">🥽 VR 모드</button>
+  <button id="reset-btn" onclick="resetGame()">↺ 처음으로</button>
+</div>
+
+<!-- 수료증 -->
+<div id="cert-screen">
+  <div class="cert-card">
+    <div class="cert-icon">🏆</div>
+    <div class="cert-label">체험 수료증</div>
+    <div class="cert-name">드론 조종사</div>
+    <div class="cert-sub">MILAB 진로체험 프로그램<br>드론 조종사 VR 체험을 완료했습니다!</div>
+    <div class="stars" id="cert-stars">⭐⭐⭐</div>
+    <div class="cert-score" id="cert-score-num">0</div>
+    <div class="cert-score-label">획득 점수</div>
+    <button class="cert-btn" onclick="resetGame()">다시 체험하기</button>
+  </div>
+</div>
+
+<!-- A-Frame VR 씬 -->
+<a-scene id="aScene" style="display:none"
+  vr-mode-ui="enabled:true"
+  loading-screen="backgroundColor:#0a0e1a;dotsColor:#00d4ff"
+  renderer="antialias:true;colorManagement:true"
+  device-orientation-permission-ui="enabled:true">
+
+  <a-assets>
+    <!-- 인라인 색상만 사용, 외부 에셋 없음 -->
+  </a-assets>
+
+  <!-- ===== 미션1: 드론 격납고 ===== -->
+  <a-entity id="scene-m1">
+    <!-- 하늘 -->
+    <a-sky color="#0d1a3a"></a-sky>
+    <!-- 바닥 (활주로) -->
+    <a-plane position="0 0 0" rotation="-90 0 0" width="200" height="200" color="#1a1a2e" material="roughness:0.9"></a-plane>
+    <!-- 활주로 중앙선 -->
+    <a-plane position="0 0.01 0" rotation="-90 0 0" width="3" height="100" color="#f0c020" material="opacity:0.6"></a-plane>
+    <!-- 격납고 건물 -->
+    <a-box position="0 4 -20" width="20" height="8" depth="15" color="#1a2a4a" material="roughness:0.7"></a-box>
+    <a-box position="0 8.5 -20" width="21" height="1" depth="16" color="#0a1a3a"></a-box>
+    <!-- DRONE CENTER 간판 -->
+    <a-entity position="0 9.5 -12.3">
+      <a-plane width="10" height="1.8" color="#0a1628" material="opacity:0.95"></a-plane>
+      <a-text value="DRONE TRAINING CENTER" color="#00d4ff" align="center" width="9" position="0 0 0.01" font="https://cdn.jsdelivr.net/gh/etiennepinchon/aframe-fonts@master/fonts/orbitron/Orbitron-Black.json"></a-text>
+    </a-entity>
+    <!-- 드론 1: 멀티콥터 -->
+    <a-entity id="drone1" position="-5 1.5 -6" class="clickable" data-idx="0">
+      <a-box width=".6" height=".15" depth=".6" color="#1a3a6e" material="metalness:0.8;roughness:0.2"></a-box>
+      <a-box position="-.5 .08 -.5" width=".3" height=".04" depth=".04" color="#2a5a9e" rotation="0 45 0"></a-box>
+      <a-box position=".5 .08 -.5" width=".3" height=".04" depth=".04" color="#2a5a9e" rotation="0 -45 0"></a-box>
+      <a-box position="-.5 .08 .5" width=".3" height=".04" depth=".04" color="#2a5a9e" rotation="0 -45 0"></a-box>
+      <a-box position=".5 .08 .5" width=".3" height=".04" depth=".04" color="#2a5a9e" rotation="0 45 0"></a-box>
+      <a-cylinder position="-.5 .1 -.5" radius=".18" height=".04" color="#00d4ff" material="opacity:0.35;transparent:true"></a-cylinder>
+      <a-cylinder position=".5 .1 -.5" radius=".18" height=".04" color="#00d4ff" material="opacity:0.35;transparent:true"></a-cylinder>
+      <a-cylinder position="-.5 .1 .5" radius=".18" height=".04" color="#00d4ff" material="opacity:0.35;transparent:true"></a-cylinder>
+      <a-cylinder position=".5 .1 .5" radius=".18" height=".04" color="#00d4ff" material="opacity:0.35;transparent:true"></a-cylinder>
+      <a-text value="① 멀티콥터" color="#00d4ff" align="center" width="3" position="0 .8 0" look-at="[camera]"></a-text>
+      <a-animation attribute="position" from="-5 1.5 -6" to="-5 1.9 -6" direction="alternate" dur="2000" repeat="indefinite" easing="easeInOutSine"></a-animation>
+      <a-cursor-listener></a-cursor-listener>
+    </a-entity>
+
+    <!-- 드론 2: 고정익 -->
+    <a-entity id="drone2" position="0 1.5 -7" class="clickable" data-idx="1">
+      <a-box width="1.2" height=".1" depth=".2" color="#2a4a1a" material="metalness:0.6"></a-box>
+      <a-box position="0 .05 0" width=".15" height=".1" depth=".8" color="#3a6a2a" material="metalness:0.6"></a-box>
+      <a-box position="0 .08 -.3" width=".4" height=".05" depth=".1" color="#3a6a2a"></a-box>
+      <a-text value="② 고정익 드론" color="#00ff88" align="center" width="3" position="0 .8 0" look-at="[camera]"></a-text>
+      <a-animation attribute="position" from="0 1.5 -7" to="0 1.9 -7" direction="alternate" dur="2400" repeat="indefinite" easing="easeInOutSine"></a-animation>
+    </a-entity>
+
+    <!-- 드론 3: 농업용 -->
+    <a-entity id="drone3" position="5 1.5 -6" class="clickable" data-idx="2">
+      <a-box width=".8" height=".2" depth=".8" color="#4a2a1a" material="roughness:0.5"></a-box>
+      <a-cylinder position="0 -.15 0" radius=".05" height=".3" color="#3a2a1a"></a-cylinder>
+      <a-cylinder position="0 -.3 0" radius=".2" height=".05" color="#2a1a0a" material="opacity:0.7;transparent:true"></a-cylinder>
+      <a-box position="-.5 .1 -.5" width=".25" height=".03" depth=".04" color="#5a3a2a" rotation="0 45 0"></a-box>
+      <a-box position=".5 .1 -.5" width=".25" height=".03" depth=".04" color="#5a3a2a" rotation="0 -45 0"></a-box>
+      <a-box position="-.5 .1 .5" width=".25" height=".03" depth=".04" color="#5a3a2a" rotation="0 -45 0"></a-box>
+      <a-box position=".5 .1 .5" width=".25" height=".03" depth=".04" color="#5a3a2a" rotation="0 45 0"></a-box>
+      <a-text value="③ 농업용 드론" color="#ffaa00" align="center" width="3" position="0 .8 0" look-at="[camera]"></a-text>
+      <a-animation attribute="position" from="5 1.5 -6" to="5 1.9 -6" direction="alternate" dur="1800" repeat="indefinite" easing="easeInOutSine"></a-animation>
+    </a-entity>
+
+    <!-- 배경 나무/산 -->
+    <a-box position="-30 5 -40" width="10" height="10" depth="8" color="#0a1a2e"></a-box>
+    <a-box position="30 7 -40" width="14" height="14" depth="10" color="#0d1f38"></a-box>
+    <a-box position="-15 3 -35" width="6" height="6" depth="6" color="#0a1a2e"></a-box>
+
+    <!-- 별 (배경) -->
+    <a-entity id="stars1">
+      <a-sphere position="-8 12 -30" radius=".05" color="#fff" material="opacity:0.8"></a-sphere>
+      <a-sphere position="5 15 -25" radius=".04" color="#fff" material="opacity:0.6"></a-sphere>
+      <a-sphere position="12 10 -28" radius=".06" color="#fff" material="opacity:0.9"></a-sphere>
+      <a-sphere position="-3 18 -35" radius=".03" color="#fff" material="opacity:0.7"></a-sphere>
+      <a-sphere position="20 14 -30" radius=".05" color="#fff" material="opacity:0.8"></a-sphere>
+      <a-sphere position="-18 16 -32" radius=".04" color="#00d4ff" material="opacity:0.7"></a-sphere>
+      <a-sphere position="8 20 -40" radius=".03" color="#fff" material="opacity:0.5"></a-sphere>
+      <a-sphere position="-25 11 -38" radius=".05" color="#fff" material="opacity:0.6"></a-sphere>
+    </a-entity>
+
+    <!-- 착지 패드 -->
+    <a-cylinder position="-5 .02 -6" radius=".8" height=".02" color="#ff6600" material="opacity:0.6;transparent:true"></a-cylinder>
+    <a-cylinder position="0 .02 -7" radius=".8" height=".02" color="#ff6600" material="opacity:0.6;transparent:true"></a-cylinder>
+    <a-cylinder position="5 .02 -6" radius=".8" height=".02" color="#ff6600" material="opacity:0.6;transparent:true"></a-cylinder>
+  </a-entity>
+
+  <!-- ===== 미션2: 비행 법규 퀴즈 ===== -->
+  <a-entity id="scene-m2" visible="false">
+    <a-sky color="#1a2a5a"></a-sky>
+    <a-plane position="0 -5 0" rotation="-90 0 0" width="200" height="200" color="#1a3a6e" material="opacity:0.5;transparent:true"></a-plane>
+    <!-- 구름 -->
+    <a-sphere position="-8 2 -15" radius="2.5" color="#e8f0ff" material="opacity:0.4;transparent:true"></a-sphere>
+    <a-sphere position="-6 2.5 -15" radius="2" color="#e8f0ff" material="opacity:0.4;transparent:true"></a-sphere>
+    <a-sphere position="-10 1.8 -14" radius="1.8" color="#e8f0ff" material="opacity:0.35;transparent:true"></a-sphere>
+    <a-sphere position="10 3 -18" radius="3" color="#e8f0ff" material="opacity:0.3;transparent:true"></a-sphere>
+    <a-sphere position="12 3.2 -17" radius="2" color="#e8f0ff" material="opacity:0.3;transparent:true"></a-sphere>
+    <!-- 퀴즈 패널 3개 -->
+    <a-entity id="quiz-panels">
+      <a-entity id="qpanel0" position="-4 1.5 -6" class="quiz-opt" data-correct="false">
+        <a-plane width="3.2" height="2.2" color="#1a1a3e" material="opacity:0.92"></a-plane>
+        <a-plane width="3.1" height="2.1" position="0 0 .01" color="#0a0a2e" material="opacity:0.5;transparent:true"></a-plane>
+        <a-text value="야간에 조명 없이\n150m 상공에서\n자유롭게 비행한다" color="#ff8888" align="center" width="2.8" position="0 .2 .02" wrap-count="18"></a-text>
+        <a-text value="❌ 잘못된 수칙" color="#ff4444" align="center" width="2.5" position="0 -.7 .02"></a-text>
+      </a-entity>
+      <a-entity id="qpanel1" position="0 1.5 -6" class="quiz-opt" data-correct="true">
+        <a-plane width="3.2" height="2.2" color="#1a3a1a" material="opacity:0.92"></a-plane>
+        <a-plane width="3.1" height="2.1" position="0 0 .01" color="#0a2a0a" material="opacity:0.5;transparent:true"></a-plane>
+        <a-text value="비행 전 비행구역을\n확인하고 허가된\n고도 이하로 비행한다" color="#88ff88" align="center" width="2.8" position="0 .2 .02" wrap-count="18"></a-text>
+        <a-text value="✅ 올바른 수칙" color="#44ff44" align="center" width="2.5" position="0 -.7 .02"></a-text>
+      </a-entity>
+      <a-entity id="qpanel2" position="4 1.5 -6" class="quiz-opt" data-correct="false">
+        <a-plane width="3.2" height="2.2" color="#1a1a3e" material="opacity:0.92"></a-plane>
+        <a-plane width="3.1" height="2.1" position="0 0 .01" color="#0a0a2e" material="opacity:0.5;transparent:true"></a-plane>
+        <a-text value="사람이 많은 곳에서\n낮게 비행해도\n신고 없이 가능하다" color="#ff8888" align="center" width="2.8" position="0 .2 .02" wrap-count="18"></a-text>
+        <a-text value="❌ 잘못된 수칙" color="#ff4444" align="center" width="2.5" position="0 -.7 .02"></a-text>
+      </a-entity>
+    </a-entity>
+    <!-- 퀴즈 안내 -->
+    <a-text value="올바른 드론 비행 수칙을 선택하세요!" color="#00d4ff" align="center" width="8" position="0 4 -7"></a-text>
+    <!-- 도시 배경 -->
+    <a-box position="-20 5 -40" width="8" height="10" depth="5" color="#1a2a4a"></a-box>
+    <a-box position="-28 8 -38" width="6" height="16" depth="5" color="#162038"></a-box>
+    <a-box position="22 6 -42" width="10" height="12" depth="6" color="#1a2a4a"></a-box>
+    <a-box position="30 10 -38" width="7" height="20" depth="5" color="#0d1828"></a-box>
+  </a-entity>
+
+  <!-- ===== 미션3: 드론 착륙 ===== -->
+  <a-entity id="scene-m3" visible="false">
+    <a-sky color="#0a1525"></a-sky>
+    <!-- 야간 활주로 -->
+    <a-plane position="0 0 0" rotation="-90 0 0" width="200" height="200" color="#0d0d1a" material="roughness:0.9"></a-plane>
+    <!-- 활주로 조명 -->
+    <a-plane position="0 .01 0" rotation="-90 0 0" width="4" height="60" color="#1a1a30" material="opacity:0.8;transparent:true"></a-plane>
+    <a-box position="-2 .3 -5" width=".1" height=".6" depth=".1" color="#ffff00" material="opacity:0.9"></a-box>
+    <a-box position="2 .3 -5" width=".1" height=".6" depth=".1" color="#ffff00" material="opacity:0.9"></a-box>
+    <a-box position="-2 .3 -10" width=".1" height=".6" depth=".1" color="#ffff00" material="opacity:0.9"></a-box>
+    <a-box position="2 .3 -10" width=".1" height=".6" depth=".1" color="#ffff00" material="opacity:0.9"></a-box>
+    <a-box position="-2 .3 -15" width=".1" height=".6" depth=".1" color="#ffffff" material="opacity:0.9"></a-box>
+    <a-box position="2 .3 -15" width=".1" height=".6" depth=".1" color="#ffffff" material="opacity:0.9"></a-box>
+    <!-- 착륙 타깃 -->
+    <a-cylinder id="landing-target" position="0 .05 -12" radius="1.5" height=".02" color="#00ff88" material="opacity:0.7;transparent:true">
+      <a-animation attribute="material.opacity" from="0.3" to="0.9" direction="alternate" dur="800" repeat="indefinite"></a-animation>
+    </a-cylinder>
+    <a-cylinder position="0 .06 -12" radius="1" height=".02" color="#00ff88" material="opacity:0.4;transparent:true"></a-cylinder>
+    <a-cylinder position="0 .07 -12" radius=".4" height=".02" color="#ffffff" material="opacity:0.8;transparent:true"></a-cylinder>
+    <a-text value="착륙 지점을\n5초간 응시하세요" color="#00ff88" align="center" width="5" position="0 2 -12">
+      <a-animation attribute="material.opacity" from="0.4" to="1" direction="alternate" dur="1000" repeat="indefinite"></a-animation>
+    </a-text>
+    <!-- 드론 상공 뷰 -->
+    <a-entity id="overhead-drone" position="0 8 -12">
+      <a-box width=".3" height=".08" depth=".3" color="#1a3a6e" material="metalness:0.8"></a-box>
+      <a-box position="-.25 .04 -.25" width=".15" height=".02" depth=".02" color="#2a5a9e" rotation="0 45 0"></a-box>
+      <a-box position=".25 .04 -.25" width=".15" height=".02" depth=".02" color="#2a5a9e" rotation="0 -45 0"></a-box>
+      <a-box position="-.25 .04 .25" width=".15" height=".02" depth=".02" color="#2a5a9e" rotation="0 -45 0"></a-box>
+      <a-box position=".25 .04 .25" width=".15" height=".02" depth=".02" color="#2a5a9e" rotation="0 45 0"></a-box>
+      <a-animation attribute="position" from="0 8 -12" to="0 4 -12" dur="3000" begin="landing" fill="forwards" easing="easeInOutQuad"></a-animation>
+    </a-entity>
+    <!-- 별 야경 -->
+    <a-sphere position="-5 15 -30" radius=".06" color="#fff" material="opacity:0.9"></a-sphere>
+    <a-sphere position="8 18 -25" radius=".04" color="#fff" material="opacity:0.7"></a-sphere>
+    <a-sphere position="-12 12 -28" radius=".05" color="#fff" material="opacity:0.8"></a-sphere>
+    <a-sphere position="15 16 -35" radius=".03" color="#fff" material="opacity:0.6"></a-sphere>
+    <a-sphere position="-20 14 -30" radius=".06" color="#ffaaff" material="opacity:0.7"></a-sphere>
+  </a-entity>
+
+  <!-- 카메라 + 커서 -->
+  <a-entity camera position="0 1.6 0" look-controls="magicWindowTrackingEnabled:true" wasd-controls="enabled:false">
+    <a-cursor
+      id="cursor"
+      fuse="true"
+      fuse-timeout="3000"
+      color="#00d4ff"
+      material="color:#00d4ff;opacity:0.85"
+      geometry="primitive:ring;radiusInner:0.02;radiusOuter:0.03"
+      raycaster="objects:.clickable,.quiz-opt,#landing-target"
+      animation__click="property:scale;startEvents:click;easing:easeInCubic;dur:150;from:0.1 0.1 0.1;to:1 1 1"
+      animation__fusing="property:scale;startEvents:fusing;easing:easeInCubic;dur:3000;from:1 1 1;to:0.1 0.1 0.1"
+      animation__unfusing="property:scale;startEvents:mouseleave;easing:easeInCubic;dur:100;to:1 1 1">
+    </a-cursor>
+  </a-entity>
+
+  <!-- 환경광 -->
+  <a-light type="ambient" color="#203060" intensity="0.8"></a-light>
+  <a-light type="directional" position="2 4 1" color="#4080ff" intensity="0.6"></a-light>
+  <a-light type="point" position="0 3 -8" color="#00d4ff" intensity="0.4" distance="20"></a-light>
+
+</a-scene>
+
+<script>
+// ===== 게임 상태 =====
+const G = {
+  mission: 1,
+  score: 0,
+  m1done: [false,false,false],
+  m2done: false,
+  m3done: false
+};
+
+const droneInfo = [
+  {
+    tag:'멀티콥터',
+    title:'멀티콥터 드론',
+    desc:'4~8개의 프로펠러로 수직 이착륙이 가능한 드론.\n촬영, 택배, 인명구조에 활용돼요.\n관련 자격증: 무인멀티콥터 조종사'
+  },
+  {
+    tag:'고정익 드론',
+    title:'고정익(Fixed-Wing) 드론',
+    desc:'비행기처럼 날개로 양력을 얻는 드론.\n장거리 비행과 대면적 탐사에 뛰어나요.\n관련 자격증: 무인비행기 조종사'
+  },
+  {
+    tag:'농업용 드론',
+    title:'농업용 드론',
+    desc:'대용량 약제 탱크를 갖춘 전문 방제 드론.\n농약 살포, 씨앗 파종, 작황 모니터링에 사용돼요.\n관련 자격증: 무인멀티콥터 조종사'
+  }
+];
+
+// ===== 시작 =====
+function startVR(){
+  document.getElementById('splash').style.display='none';
+  document.getElementById('aScene').style.display='block';
+  document.getElementById('ui-overlay').style.display='block';
+  document.getElementById('reset-btn').style.display='block';
+  showMissionBanner('MISSION 1','드론 3종류에 시선을 맞춰 정보를 확인하세요!');
+  setupM1Events();
+}
+
+// ===== 미션 배너 =====
+function showMissionBanner(title, sub, cb){
+  const b = document.getElementById('mission-banner');
+  document.getElementById('banner-title').textContent = title;
+  document.getElementById('banner-sub').textContent = sub;
+  b.style.display='block';
+  setTimeout(()=>{ b.style.display='none'; if(cb)cb(); },3000);
+}
+
+// ===== HUD 업데이트 =====
+function updateHUD(text){
+  document.getElementById('hud-mission-text').textContent = text;
+  document.getElementById('score-num').textContent = G.score;
+}
+function addScore(n){
+  G.score+=n;
+  document.getElementById('score-num').textContent=G.score;
+  const s=document.getElementById('score-num');
+  s.style.color='#00ff88';
+  setTimeout(()=>s.style.color='#fff',600);
+}
+
+// ===== 정보 패널 =====
+function showPanel(tag,title,desc){
+  const p=document.getElementById('info-panel');
+  document.getElementById('info-tag').textContent=tag;
+  document.getElementById('info-title').textContent=title;
+  document.getElementById('info-desc').textContent=desc;
+  p.style.display='block';
+  clearTimeout(window._panelTimer);
+  window._panelTimer=setTimeout(()=>p.style.display='none',5000);
+}
+
+// ===== 미션1 이벤트 =====
+function setupM1Events(){
+  document.querySelectorAll('.clickable').forEach(el=>{
+    el.addEventListener('click',function(){
+      const idx=parseInt(this.getAttribute('data-idx'));
+      if(G.m1done[idx]) return;
+      G.m1done[idx]=true;
+      const d=droneInfo[idx];
+      showPanel(d.tag,d.title,d.desc);
+      addScore(10);
+      // 시각 효과
+      this.querySelector('a-box').setAttribute('material','emissive:#00d4ff;emissiveIntensity:0.5');
+      updateDots();
+      checkM1();
+    });
+  });
+}
+
+function checkM1(){
+  if(G.m1done.every(v=>v)){
+    updateHUD('미션 1 완료! ✅');
+    setTimeout(()=>goMission2(),2000);
+  }
+}
+
+// ===== 미션2 =====
+function goMission2(){
+  G.mission=2;
+  document.getElementById('scene-m1').setAttribute('visible','false');
+  document.getElementById('scene-m2').setAttribute('visible','true');
+  setDot(1);
+  updateHUD('미션 2 — 비행 법규 퀴즈');
+  showMissionBanner('MISSION 2','올바른 드론 비행 수칙을 선택하세요!');
+  // 커서 레이캐스터 업데이트
+  document.getElementById('cursor').setAttribute('raycaster','objects:.quiz-opt');
+  document.querySelectorAll('.quiz-opt').forEach(el=>{
+    el.addEventListener('click',function(){
+      if(G.m2done) return;
+      const correct = this.getAttribute('data-correct')==='true';
+      if(correct){
+        G.m2done=true;
+        showPanel('정답!','올바른 비행 수칙','비행 전 비행구역을 확인하고 허가된 고도 이하로 비행해야 해요.\n드론 비행 위반 시 과태료 및 자격 취소가 될 수 있어요!');
+        addScore(20);
+        this.querySelector('a-plane').setAttribute('material','color:#003300;opacity:0.95');
+        setTimeout(()=>goMission3(),3000);
+      } else {
+        showPanel('오답!','다시 도전!','힌트: 드론은 항상 관련 법규를 준수하고\n안전하게 비행해야 해요. 다른 패널을 선택해보세요.');
+        this.querySelector('a-plane').setAttribute('material','color:#330000;opacity:0.95');
+      }
+    });
+  });
+}
+
+// ===== 미션3 =====
+function goMission3(){
+  G.mission=3;
+  document.getElementById('scene-m2').setAttribute('visible','false');
+  document.getElementById('scene-m3').setAttribute('visible','true');
+  setDot(2);
+  updateHUD('미션 3 — 드론 착륙');
+  showMissionBanner('MISSION 3','착륙 지점에 5초간 시선을 고정하세요!');
+  document.getElementById('cursor').setAttribute('raycaster','objects:#landing-target');
+  document.getElementById('cursor').setAttribute('fuse-timeout','5000');
+  document.getElementById('landing-target').addEventListener('click',function(){
+    if(G.m3done) return;
+    G.m3done=true;
+    // 착륙 드론 애니메이션
+    document.getElementById('overhead-drone').emit('landing');
+    addScore(30);
+    showPanel('착륙 성공!','임무 완료','훌륭합니다! 드론을 안전하게 착륙시켰어요.\n드론 조종사가 되기 위한 자질을 충분히 갖추고 있어요!');
+    setTimeout(()=>showCert(),3500);
+  });
+}
+
+// ===== 수료증 =====
+function showCert(){
+  document.getElementById('aScene').style.display='none';
+  document.getElementById('ui-overlay').style.display='none';
+  const cs=document.getElementById('cert-screen');
+  cs.style.display='flex';
+  document.getElementById('cert-score-num').textContent=G.score;
+  let stars='⭐';
+  if(G.score>=50) stars='⭐⭐';
+  if(G.score>=55) stars='⭐⭐⭐';
+  document.getElementById('cert-stars').textContent=stars;
+}
+
+// ===== 리셋 =====
+function resetGame(){
+  Object.assign(G,{mission:1,score:0,m1done:[false,false,false],m2done:false,m3done:false});
+  document.getElementById('cert-screen').style.display='none';
+  document.getElementById('splash').style.display='flex';
+  document.getElementById('aScene').style.display='none';
+  document.getElementById('ui-overlay').style.display='none';
+  // 씬 리셋
+  document.getElementById('scene-m1').setAttribute('visible','true');
+  document.getElementById('scene-m2').setAttribute('visible','false');
+  document.getElementById('scene-m3').setAttribute('visible','false');
+  document.getElementById('score-num').textContent='0';
+  document.querySelectorAll('.prog-dot').forEach((d,i)=>{d.className='prog-dot';if(i===0)d.classList.add('active')});
+}
+
+// ===== VR 모드 =====
+function toggleVR(){
+  const scene=document.getElementById('aScene');
+  if(scene.is('vr-mode')) scene.exitVR();
+  else scene.enterVR();
+}
+
+// ===== 진행 도트 =====
+function setDot(n){
+  document.querySelectorAll('.prog-dot').forEach((d,i)=>{
+    d.className='prog-dot';
+    if(i<n) d.classList.add('done');
+    if(i===n) d.classList.add('active');
+  });
+}
+function updateDots(){
+  const count=G.m1done.filter(v=>v).length;
+  updateHUD(`미션 1 — 드론 점검 (${count}/3)`);
+}
+
+// ===== 가로모드 체크 =====
+function checkOrientation(){
+  const warn=document.getElementById('landscape-warn');
+  if(document.getElementById('aScene').style.display==='none') return;
+  if(window.innerHeight>window.innerWidth){
+    warn.style.display='flex';
+  } else {
+    warn.style.display='none';
+  }
+}
+window.addEventListener('resize',checkOrientation);
+window.addEventListener('orientationchange',()=>setTimeout(checkOrientation,300));
+</script>
+</body>
+</html>
