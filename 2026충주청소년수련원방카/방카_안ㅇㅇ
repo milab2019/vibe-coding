@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>🎮 게임 퀴즈</title>
+
+<style>
+
+body {
+
+  font-family: 'Arial', sans-serif;
+
+  margin: 0;
+
+  padding: 0;
+
+  background: #f0f8ff;
+
+  text-align: center;
+
+}
+
+.container {
+
+  padding: 20px;
+
+}
+
+h1 {
+
+  font-size: 24px;
+
+}
+
+.mascot {
+
+  font-size: 50px;
+
+}
+
+.question {
+
+  font-size: 20px;
+
+  margin: 20px 0;
+
+}
+
+.choice {
+
+  display: block;
+
+  margin: 10px auto;
+
+  padding: 12px;
+
+  width: 90%;
+
+  border-radius: 10px;
+
+  border: none;
+
+  background: #fff;
+
+  font-size: 16px;
+
+}
+
+.choice.correct {
+
+  background: #90ee90;
+
+}
+
+.choice.wrong {
+
+  background: #ffcccb;
+
+}
+
+.explanation {
+
+  margin-top: 10px;
+
+  font-size: 14px;
+
+}
+
+#nextBtn {
+
+  margin-top: 15px;
+
+  padding: 10px 20px;
+
+  border: none;
+
+  border-radius: 10px;
+
+  background: #4caf50;
+
+  color: white;
+
+  font-size: 16px;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="mascot">🐰🎮</div>
+
+  <h1>게임 퀴즈</h1>
+
+  <div id="quiz"></div>
+
+  <button id="nextBtn" onclick="nextQuestion()">다음</button>
+
+</div>
+
+<script>
+
+const quizData = [
+
+  {
+
+    q: "마리오가 처음 등장한 게임은?",
+
+    c: ["슈퍼 마리오 브라더스", "동키콩", "마리오 카트", "젤다의 전설"],
+
+    a: 1,
+
+    e: "마리오는 1981년 동키콩에서 처음 등장했습니다."
+
+  },
+
+  {
+
+    q: "포켓몬의 창시자는?",
+
+    c: ["미야모토 시게루", "다지리 사토시", "이와타 사토루", "코지마 히데오"],
+
+    a: 1,
+
+    e: "다지리 사토시가 포켓몬을 만들었습니다."
+
+  },
+
+  {
+
+    q: "리그 오브 레전드의 개발사는?",
+
+    c: ["블리자드", "라이엇 게임즈", "넥슨", "EA"],
+
+    a: 1,
+
+    e: "라이엇 게임즈에서 개발했습니다."
+
+  },
+
+  {
+
+    q: "오버워치의 장르는?",
+
+    c: ["RPG", "FPS", "레이싱", "퍼즐"],
+
+    a: 1,
+
+    e: "FPS(1인칭 슈팅 게임)입니다."
+
+  },
+
+  {
+
+    q: "마인크래프트에서 블록을 캐는 도구는?",
+
+    c: ["검", "도끼", "곡괭이", "활"],
+
+    a: 2,
+
+    e: "곡괭이를 사용합니다."
+
+  },
+
+  {
+
+    q: "젤다의 전설 주인공 이름은?",
+
+    c: ["젤다", "링크", "가논", "마리오"],
+
+    a: 1,
+
+    e: "주인공은 링크입니다."
+
+  },
+
+  {
+
+    q: "스타크래프트의 종족이 아닌 것은?",
+
+    c: ["테란", "저그", "프로토스", "엘프"],
+
+    a: 3,
+
+    e: "엘프는 스타크래프트 종족이 아닙니다."
+
+  },
+
+  {
+
+    q: "배틀그라운드의 줄임말은?",
+
+    c: ["LOL", "PUBG", "FPS", "RPG"],
+
+    a: 1,
+
+    e: "PlayerUnknown's Battlegrounds의 약자는 PUBG입니다."
+
+  },
+
+  {
+
+    q: "닌텐도의 대표 콘솔은?",
+
+    c: ["플레이스테이션", "엑스박스", "스위치", "게임보이"],
+
+    a: 2,
+
+    e: "닌텐도 스위치가 대표 콘솔입니다."
+
+  },
+
+  {
+
+    q: "테트리스의 목표는?",
+
+    c: ["적을 물리친다", "블록을 쌓는다", "줄을 없앤다", "보스를 잡는다"],
+
+    a: 2,
+
+    e: "가로 줄을 완성해 없애는 것이 목표입니다."
+
+  }
+
+];
+
+let current = 0;
+
+let score = 0;
+
+let answered = false;
+
+function loadQuestion() {
+
+  const q = quizData[current];
+
+  const quizDiv = document.getElementById("quiz");
+
+  quizDiv.innerHTML = `
+
+    <div class="question">${current+1}. ${q.q}</div>
+
+    ${q.c.map((choice, i) => `<button class="choice" onclick="selectAnswer(${i}, this)">${choice}</button>`).join("")}
+
+    <div class="explanation" id="exp"></div>
+
+  `;
+
+  answered = false;
+
+}
+
+function selectAnswer(i, btn) {
+
+  if (answered) return;
+
+  answered = true;
+
+  const q = quizData[current];
+
+  const buttons = document.querySelectorAll(".choice");
+
+  buttons.forEach((b, idx) => {
+
+    if (idx === q.a) b.classList.add("correct");
+
+    else if (idx === i) b.classList.add("wrong");
+
+  });
+
+  if (i === q.a) score++;
+
+  document.getElementById("exp").innerText = q.e;
+
+}
+
+function nextQuestion() {
+
+  if (!answered) return alert("답을 선택하세요!");
+
+  current++;
+
+  if (current < quizData.length) {
+
+    loadQuestion();
+
+  } else {
+
+    showResult();
+
+  }
+
+}
+
+function showResult() {
+
+  document.getElementById("quiz").innerHTML = `
+
+    <h2>🎉 결과 🎉</h2>
+
+    <p>${score} / ${quizData.length} 점</p>
+
+    <p>${score === quizData.length ? "완벽해요! 😆" : "잘했어요! 😊"}</p>
+
+  `;
+
+  document.getElementById("nextBtn").style.display = "none";
+
+}
+
+loadQuestion();
+
+</script>
+
+</body>
+
+</html>
