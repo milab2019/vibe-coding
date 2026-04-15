@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>대한민국 라면 퀴즈 🍜</title>
+
+<style>
+
+body {
+
+  font-family: sans-serif;
+
+  background: #fff8f0;
+
+  margin: 0;
+
+  padding: 0;
+
+  text-align: center;
+
+}
+
+.container {
+
+  padding: 20px;
+
+}
+
+h1 {
+
+  font-size: 24px;
+
+}
+
+.mascot {
+
+  font-size: 50px;
+
+}
+
+.question {
+
+  font-size: 20px;
+
+  margin: 20px 0;
+
+}
+
+.choices button {
+
+  display: block;
+
+  width: 100%;
+
+  margin: 10px 0;
+
+  padding: 15px;
+
+  font-size: 16px;
+
+  border-radius: 10px;
+
+  border: none;
+
+  background: #eee;
+
+}
+
+.correct {
+
+  background-color: #4CAF50 !important;
+
+  color: white;
+
+}
+
+.wrong {
+
+  background-color: #f44336 !important;
+
+  color: white;
+
+}
+
+.explanation {
+
+  margin-top: 10px;
+
+  font-size: 14px;
+
+}
+
+#nextBtn {
+
+  margin-top: 20px;
+
+  padding: 10px 20px;
+
+  font-size: 16px;
+
+}
+
+.hidden {
+
+  display: none;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="mascot">🍜😋</div>
+
+  <h1>대한민국 라면 퀴즈</h1>
+
+  <div id="quiz">
+
+    <div class="question" id="question"></div>
+
+    <div class="choices" id="choices"></div>
+
+    <div class="explanation hidden" id="explanation"></div>
+
+    <button id="nextBtn" class="hidden">다음</button>
+
+  </div>
+
+  <div id="result" class="hidden">
+
+    <h2>결과 🎉</h2>
+
+    <p id="score"></p>
+
+    <button onclick="location.reload()">다시하기</button>
+
+  </div>
+
+</div>
+
+<script>
+
+const quizData = [
+
+  {
+
+    q: "신라면을 만든 회사는?",
+
+    c: ["오뚜기", "농심", "삼양", "팔도"],
+
+    a: 1,
+
+    e: "신라면은 농심에서 만든 대표 라면입니다."
+
+  },
+
+  {
+
+    q: "짜파게티는 어떤 라면인가?",
+
+    c: ["국물라면", "비빔라면", "볶음라면", "컵라면"],
+
+    a: 2,
+
+    e: "짜파게티는 물을 버리고 비벼 먹는 볶음라면입니다."
+
+  },
+
+  {
+
+    q: "삼양라면은 몇 년에 출시되었을까?",
+
+    c: ["1963년", "1975년", "1985년", "1995년"],
+
+    a: 0,
+
+    e: "삼양라면은 1963년에 출시된 한국 최초 라면입니다."
+
+  },
+
+  {
+
+    q: "불닭볶음면의 특징은?",
+
+    c: ["매운맛", "달콤한맛", "짜장맛", "해물맛"],
+
+    a: 0,
+
+    e: "불닭볶음면은 매우 매운 라면으로 유명합니다."
+
+  },
+
+  {
+
+    q: "진라면은 어떤 회사 제품인가?",
+
+    c: ["농심", "오뚜기", "삼양", "팔도"],
+
+    a: 1,
+
+    e: "진라면은 오뚜기 제품입니다."
+
+  },
+
+  {
+
+    q: "너구리 라면의 특징은?",
+
+    c: ["해물맛", "치즈맛", "카레맛", "불맛"],
+
+    a: 0,
+
+    e: "너구리는 다시마가 들어간 해물라면입니다."
+
+  },
+
+  {
+
+    q: "비빔면으로 유명한 브랜드는?",
+
+    c: ["팔도", "농심", "오뚜기", "삼양"],
+
+    a: 0,
+
+    e: "팔도 비빔면이 가장 유명합니다."
+
+  },
+
+  {
+
+    q: "컵라면의 장점은?",
+
+    c: ["맛이 없음", "휴대성", "비쌈", "조리 어려움"],
+
+    a: 1,
+
+    e: "컵라면은 간편하게 먹을 수 있는 것이 장점입니다."
+
+  },
+
+  {
+
+    q: "라면을 끓일 때 일반적인 물 양은?",
+
+    c: ["100ml", "300ml", "500ml", "1L"],
+
+    a: 2,
+
+    e: "보통 라면 1개 기준 약 500ml 물을 사용합니다."
+
+  },
+
+  {
+
+    q: "한국에서 가장 많이 소비되는 라면 유형은?",
+
+    c: ["쌀국수", "국물라면", "파스타", "우동"],
+
+    a: 1,
+
+    e: "한국에서는 국물라면 소비가 가장 많습니다."
+
+  }
+
+];
+
+let current = 0;
+
+let score = 0;
+
+const questionEl = document.getElementById("question");
+
+const choicesEl = document.getElementById("choices");
+
+const explanationEl = document.getElementById("explanation");
+
+const nextBtn = document.getElementById("nextBtn");
+
+const resultEl = document.getElementById("result");
+
+function loadQuestion() {
+
+  const data = quizData[current];
+
+  questionEl.innerText = data.q;
+
+  choicesEl.innerHTML = "";
+
+  explanationEl.classList.add("hidden");
+
+  nextBtn.classList.add("hidden");
+
+  data.c.forEach((choice, index) => {
+
+    const btn = document.createElement("button");
+
+    btn.innerText = choice;
+
+    btn.onclick = () => selectAnswer(btn, index);
+
+    choicesEl.appendChild(btn);
+
+  });
+
+}
+
+function selectAnswer(btn, index) {
+
+  const data = quizData[current];
+
+  const buttons = choicesEl.querySelectorAll("button");
+
+  buttons.forEach((b, i) => {
+
+    b.disabled = true;
+
+    if (i === data.a) b.classList.add("correct");
+
+    if (i === index && i !== data.a) b.classList.add("wrong");
+
+  });
+
+  if (index === data.a) score++;
+
+  explanationEl.innerText = data.e;
+
+  explanationEl.classList.remove("hidden");
+
+  nextBtn.classList.remove("hidden");
+
+}
+
+nextBtn.onclick = () => {
+
+  current++;
+
+  if (current < quizData.length) {
+
+    loadQuestion();
+
+  } else {
+
+    showResult();
+
+  }
+
+};
+
+function showResult() {
+
+  document.getElementById("quiz").classList.add("hidden");
+
+  resultEl.classList.remove("hidden");
+
+  document.getElementById("score").innerText = `${score} / ${quizData.length} 점`;
+
+}
+
+loadQuestion();
+
+</script>
+
+</body>
+
+</html>
