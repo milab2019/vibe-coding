@@ -1,0 +1,335 @@
+```html
+
+<!DOCTYPE html>
+
+<html lang="ko">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>수능 수학 퀴즈 🧠</title>
+
+<style>
+
+body {
+
+    font-family: 'Arial', sans-serif;
+
+    margin: 0;
+
+    padding: 20px;
+
+    background: #f5f7fb;
+
+    text-align: center;
+
+}
+
+.container {
+
+    max-width: 500px;
+
+    margin: auto;
+
+}
+
+h1 {
+
+    font-size: 22px;
+
+}
+
+.question {
+
+    font-size: 18px;
+
+    margin: 20px 0;
+
+}
+
+.choice {
+
+    display: block;
+
+    margin: 10px 0;
+
+    padding: 12px;
+
+    border-radius: 10px;
+
+    border: 1px solid #ddd;
+
+    background: white;
+
+    cursor: pointer;
+
+}
+
+.choice.correct { background: #c8f7c5; }
+
+.choice.wrong { background: #f7c5c5; }
+
+button {
+
+    margin-top: 20px;
+
+    padding: 10px 20px;
+
+    border: none;
+
+    border-radius: 10px;
+
+    background: #4CAF50;
+
+    color: white;
+
+    font-size: 16px;
+
+}
+
+.explanation {
+
+    margin-top: 10px;
+
+    font-size: 14px;
+
+    color: #555;
+
+}
+
+.mascot {
+
+    font-size: 40px;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="mascot">🐰📘</div>
+
+<h1>고3 수학 퀴즈</h1>
+
+<div id="quiz"></div>
+
+</div>
+
+<script>
+
+const quizData = [
+
+{
+
+q: "lim x→0 (sin x / x)의 값은?",
+
+c: ["0", "1", "∞", "-1"],
+
+a: 1,
+
+e: "대표적인 극한 공식으로 값은 1입니다."
+
+},
+
+{
+
+q: "함수 f(x)=x²의 도함수는?",
+
+c: ["2x", "x", "x²", "1"],
+
+a: 0,
+
+e: "x²의 미분은 2x입니다."
+
+},
+
+{
+
+q: "∫ 2x dx = ?",
+
+c: ["x² + C", "2x + C", "x²", "x + C"],
+
+a: 0,
+
+e: "적분하면 x² + C가 됩니다."
+
+},
+
+{
+
+q: "등차수열 2, 4, 6,...의 일반항은?",
+
+c: ["2n", "n+2", "2n+2", "n²"],
+
+a: 0,
+
+e: "공차가 2이므로 2n입니다."
+
+},
+
+{
+
+q: "log₂ 8의 값은?",
+
+c: ["2", "3", "4", "8"],
+
+a: 1,
+
+e: "2³=8이므로 3입니다."
+
+},
+
+{
+
+q: "x² - 4 = 0의 해는?",
+
+c: ["±2", "2", "-2", "0"],
+
+a: 0,
+
+e: "x=±2입니다."
+
+},
+
+{
+
+q: "확률에서 사건 A의 여사건은?",
+
+c: ["A'", "A²", "B", "0"],
+
+a: 0,
+
+e: "여사건은 A'로 표현합니다."
+
+},
+
+{
+
+q: "삼각함수 sin(90°)의 값은?",
+
+c: ["0", "1", "-1", "∞"],
+
+a: 1,
+
+e: "sin(90°)=1입니다."
+
+},
+
+{
+
+q: "행렬에서 단위행렬의 특징은?",
+
+c: ["대각선이 1", "모두 0", "모두 1", "없음"],
+
+a: 0,
+
+e: "대각선만 1이고 나머지는 0입니다."
+
+},
+
+{
+
+q: "함수 y = e^x의 미분은?",
+
+c: ["e^x", "x e^x", "1", "ln x"],
+
+a: 0,
+
+e: "e^x는 자기 자신으로 미분됩니다."
+
+}
+
+];
+
+let current = 0;
+
+let score = 0;
+
+function loadQuiz() {
+
+    const quiz = document.getElementById("quiz");
+
+    const q = quizData[current];
+
+    quiz.innerHTML = `
+
+        <div class="question">${current+1}. ${q.q}</div>
+
+        ${q.c.map((choice, i) => 
+
+            `<div class="choice" onclick="selectAnswer(${i})">${choice}</div>`
+
+        ).join("")}
+
+        <div class="explanation" id="exp"></div>
+
+    `;
+
+}
+
+function selectAnswer(i) {
+
+    const choices = document.querySelectorAll(".choice");
+
+    const correct = quizData[current].a;
+
+    choices.forEach((el, idx) => {
+
+        if (idx === correct) el.classList.add("correct");
+
+        else if (idx === i) el.classList.add("wrong");
+
+        el.onclick = null;
+
+    });
+
+    if (i === correct) score++;
+
+    document.getElementById("exp").innerText = quizData[current].e;
+
+    setTimeout(() => {
+
+        current++;
+
+        if (current < quizData.length) loadQuiz();
+
+        else showResult();
+
+    }, 1200);
+
+}
+
+function showResult() {
+
+    const quiz = document.getElementById("quiz");
+
+    quiz.innerHTML = `
+
+        <h2>🎉 결과</h2>
+
+        <p>${score} / ${quizData.length} 점</p>
+
+        <p>${score >= 8 ? "🔥 훌륭해!" : score >=5 ? "👍 잘했어!" : "💪 조금 더 연습!"}</p>
+
+        <button onclick="location.reload()">다시하기</button>
+
+    `;
+
+}
+
+loadQuiz();
+
+</script>
+
+</body>
+
+</html>
+
+```
