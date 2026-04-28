@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🐱 야옹야옹 고양이 퀴즈 🐱</title>
+    <style>
+        body {
+            font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+            background-color: #FFF3E0;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #333;
+        }
+        .container {
+            background-color: white;
+            width: 90%;
+            max-width: 500px;
+            border-radius: 20px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            padding: 20px;
+            text-align: center;
+            box-sizing: border-box;
+        }
+        .mascot {
+            font-size: 80px;
+            margin: 10px 0;
+            animation: bounce 2s infinite;
+        }
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+            40% {transform: translateY(-20px);}
+            60% {transform: translateY(-10px);}
+        }
+        h1 {
+            font-size: 1.5rem;
+            color: #FF9800;
+        }
+        .btn {
+            background-color: #FFB74D;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 15px 20px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            margin: 10px 0;
+            transition: transform 0.1s, background-color 0.2s;
+        }
+        .btn:active {
+            transform: scale(0.98);
+        }
+        .btn:hover {
+            background-color: #FFA726;
+        }
+        .screen {
+            display: none;
+        }
+        .screen.active {
+            display: block;
+        }
+        .question-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .option {
+            background-color: #EEEEEE;
+            color: #333;
+            border: 2px solid #E0E0E0;
+        }
+        .option.correct {
+            background-color: #4CAF50;
+            color: white;
+            border-color: #388E3C;
+        }
+        .option.wrong {
+            background-color: #F44336;
+            color: white;
+            border-color: #D32F2F;
+        }
+        .option:disabled {
+            cursor: not-allowed;
+            opacity: 0.9;
+        }
+        .explanation-box {
+            display: none;
+            background-color: #E3F2FD;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        .progress {
+            color: #757575;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+        .next-btn {
+            background-color: #2196F3;
+            margin-top: 15px;
+            display: none;
+        }
+        .next-btn:hover {
+            background-color: #1E88E5;
+        }
+        .score-text {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #FF9800;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="start-screen" class="screen active">
+        <div class="mascot">😻</div>
+        <h1>도전! 고양이 퀴즈</h1>
+        <p>고양이에 대해 얼마나 잘 알고 있나요?<br>총 10문제를 풀어보세요!</p>
+        <button class="btn" onclick="startQuiz()">시작하기 (BGM 켬)</button>
+    </div>
+
+    <div id="quiz-screen" class="screen">
+        <div class="progress" id="progress-text">문제 1 / 10</div>
+        <div class="mascot" id="quiz-mascot" style="font-size: 50px; animation: none;">😸</div>
+        <div class="question-title" id="question-text">질문이 여기에 표시됩니다.</div>
+        <div id="options-container">
+            </div>
+        <div class="explanation-box" id="explanation-text">해설이 여기에 표시됩니다.</div>
+        <button class="btn next-btn" id="next-btn" onclick="nextQuestion()">다음 문제</button>
+    </div>
+
+    <div id="result-screen" class="screen">
+        <div class="mascot" id="result-mascot">🎉</div>
+        <h1>퀴즈 완료!</h1>
+        <p>당신의 점수는...</p>
+        <div class="score-text" id="final-score">100점</div>
+        <p id="result-message">정말 대단해요!</p>
+        <button class="btn" onclick="location.reload()">다시 하기</button>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        {
+            q: "고양이가 기분이 아주 좋을 때 목에서 내는 진동 소리는 무엇일까요?",
+            options: ["멍멍", "하악", "골골 (가르랑)", "짹짹"],
+            answer: 2,
+            exp: "고양이는 기분이 좋거나 편안할 때 목에서 '골골' 또는 '가르랑' 거리는 소리를 냅니다."
+        },
+        {
+            q: "일반적으로 고양이의 발가락은 총 몇 개일까요?",
+            options: ["16개 (앞4, 뒤4)", "18개 (앞5, 뒤4)", "20개 (앞5, 뒤5)", "14개 (앞4, 뒤3)"],
+            answer: 1,
+            exp: "대부분의 고양이는 앞발에 5개, 뒷발에 4개로 총 18개의 발가락을 가지고 있어요."
+        },
+        {
+            q: "고양이의 수염은 어떤 역할을 할까요?",
+            options: ["온도 느끼기", "멋내기용", "냄새 맡기", "공간의 너비 측정과 감각"],
+            answer: 3,
+            exp: "고양이의 수염은 아주 예민한 감각 기관이라서, 좁은 곳을 지나갈 수 있는지 크기를 가늠하거나 공기의 흐름을 느낄 때 사용해요."
+        },
+        {
+            q: "고양이가 하루 중 가장 활발하게 움직이는 시간은 언제일까요?",
+            options: ["한낮", "새벽과 해질녘", "자정 (한밤중)", "아침 9시"],
+            answer: 1,
+            exp: "고양이는 야행성이 아니라 '박명박모성' 동물이에요. 그래서 해가 뜨는 새벽이나 해가 지는 저녁에 가장 활발하답니다."
+        },
+        {
+            q: "고양이가 먹으면 절대 안 되는 위험한 음식은 무엇일까요?",
+            options: ["닭가슴살", "초콜릿", "고양이용 통조림", "삶은 생선"],
+            answer: 1,
+            exp: "초콜릿에는 고양이와 강아지에게 독이 되는 성분이 들어있어서 절대 주면 안 돼요! 양파와 포도도 매우 위험합니다."
+        },
+        {
+            q: "고양이가 꼬리를 안테나처럼 바짝 위로 세우고 다가올 때는 어떤 기분일까요?",
+            options: ["화가 났음", "슬픔", "반갑고 친근함", "무서움"],
+            answer: 2,
+            exp: "꼬리를 바짝 세우고 끝을 살짝 구부린 채 다가오는 것은 '반가워!', '놀아줘!'라는 친근함의 표시예요."
+        },
+        {
+            q: "고양이가 화장실에서 볼일을 보고 모래로 덮는 이유는 무엇일까요?",
+            options: ["심심해서 장난치는 것", "자신의 냄새와 흔적을 숨기려는 본능", "발톱을 깎기 위해서", "모래를 따뜻하게 하려고"],
+            answer: 1,
+            exp: "야생에서 적들에게 자신의 위치를 들키지 않기 위해 냄새를 숨기는 오래된 생존 본능입니다."
+        },
+        {
+            q: "고양이의 혀를 만져보면 까끌까끌합니다. 그 이유는 무엇일까요?",
+            options: ["물을 잘 마시기 위해", "가시 같은 돌기가 있어서 빗질(그루밍)을 하려고", "음식을 씹기 위해", "맛을 더 잘 느끼려고"],
+            answer: 1,
+            exp: "고양이의 혀에는 뒤로 굽은 작은 돌기들이 있어서, 털을 빗질하고 뼈에서 고기를 발라먹는 데 아주 유용해요."
+        },
+        {
+            q: "고양이가 높은 곳에서 떨어져도 사뿐히 착지할 수 있는 이유는 무엇일까요?",
+            options: ["날개가 있어서", "몸이 아주 유연하고 반사 신경이 뛰어나서", "뼈가 없어서", "바람을 타고 날아서"],
+            answer: 1,
+            exp: "고양이는 척추가 매우 유연하고 반사 신경이 좋아서, 공중에서 재빨리 몸을 비틀어 발로 안전하게 착지할 수 있는 능력이 있어요."
+        },
+        {
+            q: "고양이는 앞발로 물건을 툭툭 쳐서 떨어뜨리는 장난을 좋아합니다. 그 이유는 무엇일까요?",
+            options: ["주인을 화나게 하려고", "호기심 때문에 물건이 살았는지 확인하려고", "방을 청소하려고", "배가 고파서"],
+            answer: 1,
+            exp: "고양이는 호기심이 아주 많아요. 낯선 물건을 앞발로 쳐서 움직이는지(사냥감인지) 확인해보는 본능적인 행동이랍니다."
+        }
+    ];
+
+    let currentQuestion = 0;
+    let score = 0;
+
+    // Web Audio API BGM
+    let audioCtx;
+    let isPlaying = false;
+    
+    function startBGM() {
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+        if (isPlaying) return;
+        isPlaying = true;
+
+        // 귀여운 멜로디 (동요 '나비야' 모티브)
+        const notes = [
+            {f: 392.00, d: 250}, {f: 329.63, d: 250}, {f: 329.63, d: 500},
+            {f: 349.23, d: 250}, {f: 293.66, d: 250}, {f: 293.66, d: 500},
+            {f: 261.63, d: 250}, {f: 293.66, d: 250}, {f: 329.63, d: 250}, {f: 349.23, d: 250},
+            {f: 392.00, d: 250}, {f: 392.00, d: 250}, {f: 392.00, d: 500}
+        ];
+
+        let noteIndex = 0;
+        let nextNoteTime = audioCtx.currentTime + 0.1;
+
+        function schedule() {
+            while (nextNoteTime < audioCtx.currentTime + 0.1 && isPlaying) {
+                playNote(notes[noteIndex].f, nextNoteTime, notes[noteIndex].d / 1000);
+                nextNoteTime += (notes[noteIndex].d / 1000) + 0.05;
+                noteIndex = (noteIndex + 1) % notes.length;
+            }
+            if (isPlaying) {
+                setTimeout(schedule, 50);
+            }
+        }
+        schedule();
+    }
+
+    function playNote(freq, time, duration) {
+        if(!audioCtx) return;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.value = freq;
+        
+        gain.gain.setValueAtTime(0.05, time);
+        gain.gain.exponentialRampToValueAtTime(0.001, time + duration - 0.01);
+        
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        
+        osc.start(time);
+        osc.stop(time + duration);
+    }
+
+    function switchScreen(screenId) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(screenId).classList.add('active');
+    }
+
+    function startQuiz() {
+        startBGM();
+        switchScreen('quiz-screen');
+        loadQuestion();
+    }
+
+    function loadQuestion() {
+        const qData = questions[currentQuestion];
+        document.getElementById('progress-text').innerText = `문제 ${currentQuestion + 1} / ${questions.length}`;
+        document.getElementById('question-text').innerText = qData.q;
+        document.getElementById('quiz-mascot').innerText = "🤔";
+        
+        const optionsContainer = document.getElementById('options-container');
+        optionsContainer.innerHTML = "";
+        
+        qData.options.forEach((opt, index) => {
+            const btn = document.createElement('button');
+            btn.className = 'btn option';
+            btn.innerText = opt;
+            btn.onclick = () => checkAnswer(index, btn);
+            optionsContainer.appendChild(btn);
+        });
+
+        document.getElementById('explanation-text').style.display = 'none';
+        document.getElementById('next-btn').style.display = 'none';
+    }
+
+    function checkAnswer(selectedIndex, btnElement) {
+        const qData = questions[currentQuestion];
+        const buttons = document.querySelectorAll('.option');
+        
+        buttons.forEach(btn => btn.disabled = true);
+
+        if (selectedIndex === qData.answer) {
+            btnElement.classList.add('correct');
+            document.getElementById('quiz-mascot').innerText = "😻";
+            score += 10;
+            playSFX(600, 800, 0.1); // 정답 효과음
+        } else {
+            btnElement.classList.add('wrong');
+            buttons[qData.answer].classList.add('correct');
+            document.getElementById('quiz-mascot').innerText = "😿";
+            playSFX(300, 200, 0.2); // 오답 효과음
+        }
+
+        const expBox = document.getElementById('explanation-text');
+        expBox.innerHTML = `<strong>${selectedIndex === qData.answer ? '정답입니다!' : '틀렸어요!'}</strong><br>${qData.exp}`;
+        expBox.style.display = 'block';
+        document.getElementById('next-btn').style.display = 'block';
+    }
+
+    function nextQuestion() {
+        currentQuestion++;
+        if (currentQuestion < questions.length) {
+            loadQuestion();
+        } else {
+            showResult();
+        }
+    }
+
+    function showResult() {
+        isPlaying = false; // BGM 정지
+        switchScreen('result-screen');
+        document.getElementById('final-score
