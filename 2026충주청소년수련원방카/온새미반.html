@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>도깨비 체육 퀴즈</title>
+    <style>
+        :root {
+            --primary-color: #6c5ce7;
+            --correct-color: #2ecc71;
+            --wrong-color: #e74c3c;
+            --bg-color: #f0f3f5;
+        }
+
+        body {
+            font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        #quiz-container {
+            width: 90%;
+            max-width: 500px;
+            background: white;
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .mascot {
+            font-size: 50px;
+            margin-bottom: 10px;
+        }
+
+        .progress {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .question {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            word-break: keep-all;
+        }
+
+        .options {
+            display: grid;
+            gap: 10px;
+        }
+
+        button {
+            padding: 15px;
+            font-size: 1rem;
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .correct {
+            background-color: var(--correct-color) !important;
+            color: white;
+            border-color: var(--correct-color) !important;
+        }
+
+        .wrong {
+            background-color: var(--wrong-color) !important;
+            color: white;
+            border-color: var(--wrong-color) !important;
+        }
+
+        #explanation {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 10px;
+            display: none;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        #next-btn, #restart-btn {
+            margin-top: 20px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            width: 100%;
+            font-weight: bold;
+            display: none;
+        }
+
+        .result-screen {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div id="quiz-container">
+    <div id="game-view">
+        <div class="mascot">👹</div>
+        <div class="progress" id="progress">문제 1 / 20</div>
+        <div class="question" id="question">질문이 여기에 표시됩니다.</div>
+        <div class="options" id="options">
+            </div>
+        <div id="explanation"></div>
+        <button id="next-btn">다음 문제로!</button>
+    </div>
+
+    <div id="result-view" class="result-screen">
+        <div class="mascot">🎊</div>
+        <h2>퀴즈 종료!</h2>
+        <p style="font-size: 1.5rem; font-weight: bold;" id="score-text"></p>
+        <button id="restart-btn" style="display: block;">다시 도전하기</button>
+    </div>
+</div>
+
+<script>
+    const quizData = [
+        { q: "야구에서 타자가 친 공이 담장을 넘어가면 무엇이라고 할까요?", a: ["홈런", "안타", "파울", "아웃"], c: 0, e: "펜스를 넘기면 홈런이라고 부르며 베이스를 모두 돌 수 있어요!" },
+        { q: "축구에서 골키퍼만 할 수 있는 행동은?", a: ["손으로 공 잡기", "헤딩하기", "달리기", "발로 차기"], c: 0, e: "골키퍼는 페널티 에어리어 안에서 손을 사용할 수 있는 유일한 선수예요." },
+        { q: "합기도에서 자신을 보호하며 넘어지는 기술은?", a: ["낙법", "발차기", "찌르기", "던지기"], c: 0, e: "낙법은 몸을 다치지 않게 안전하게 땅에 닿는 기술이에요." },
+        { q: "달리기 시합에서 출발 신호를 알리는 기구는?", a: ["신호총", "호루라기", "깃발", "박수"], c: 0, e: "정식 시합에서는 신호총 소리에 맞춰 출발해요." },
+        { q: "자전거를 탈 때 머리를 보호하기 위해 써야 하는 것은?", a: ["헬멧", "모자", "헤드셋", "선글라스"], c:
