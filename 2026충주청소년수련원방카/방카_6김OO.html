@@ -120,6 +120,7 @@
         <div class="mascot">🐶</div>
         <h1>영어 퀴즈 대모험!</h1>
         <p>6학년 1학기 내용을 복습해봐요!</p>
+        <p style="font-size: 0.8em; color: #888;">(시작 버튼을 누르면 배경음악이 나옵니다)</p>
         <button id="start-btn" onclick="startQuiz()">시작하기!</button>
     </div>
 
@@ -140,8 +141,8 @@
     </div>
 </div>
 
-<audio id="bgm" loop>
-    <source src="https://actions.google.com/sounds/v1/science_fiction/hyperspace.ogg" type="audio/ogg">
+<audio id="bgm" loop preload="auto">
+    <source src="https://actions.google.com/sounds/v1/foley/wind_chime_vibrant.ogg" type="audio/ogg">
 </audio>
 
 <script>
@@ -193,11 +194,18 @@
     let currentIdx = 0;
     let score = 0;
     let answered = false;
+    const bgm = document.getElementById('bgm');
 
     function startQuiz() {
         document.getElementById('start-screen').classList.add('hidden');
         document.getElementById('quiz-screen').classList.remove('hidden');
-        document.getElementById('bgm').play().catch(e => console.log("Audio play failed"));
+        
+        // 브라우저 정책 상 사용자 클릭 후 재생 가능
+        bgm.volume = 0.5; // 볼륨 50%
+        bgm.play().catch(error => {
+            console.log("자동 재생이 차단되었습니다. 클릭 후 재생됩니다.", error);
+        });
+        
         showQuestion();
     }
 
