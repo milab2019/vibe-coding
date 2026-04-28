@@ -69,6 +69,7 @@
             font-size: 1.2rem;
             font-weight: bold;
             margin-bottom: 20px;
+            word-break: keep-all;
         }
         .option {
             background-color: #EEEEEE;
@@ -97,6 +98,7 @@
             margin-top: 20px;
             font-size: 0.95rem;
             line-height: 1.5;
+            text-align: left;
         }
         .progress {
             color: #757575;
@@ -217,20 +219,27 @@
     let score = 0;
 
     // Web Audio API BGM
-    let audioCtx;
+    let audioCtx = null;
     let isPlaying = false;
     
+    function initAudio() {
+        try {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            if (AudioContext && !audioCtx) {
+                audioCtx = new AudioContext();
+            }
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        } catch (e) {
+            console.warn("오디오 초기화 실패(권한 문제 등):", e);
+        }
+    }
+
     function startBGM() {
-        if (!audioCtx) {
-            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        }
-        if (audioCtx.state === 'suspended') {
-            audioCtx.resume();
-        }
-        if (isPlaying) return;
+        if (!audioCtx || isPlaying) return;
         isPlaying = true;
 
-        // 귀여운 멜로디 (동요 '나비야' 모티브)
         const notes = [
             {f: 392.00, d: 250}, {f: 329.63, d: 250}, {f: 329.63, d: 500},
             {f: 349.23, d: 250}, {f: 293.66, d: 250}, {f: 293.66, d: 500},
@@ -242,13 +251,17 @@
         let nextNoteTime = audioCtx.currentTime + 0.1;
 
         function schedule() {
-            while (nextNoteTime < audioCtx.currentTime + 0.1 && isPlaying) {
-                playNote(notes[noteIndex].f, nextNoteTime, notes[noteIndex].d / 1000);
-                nextNoteTime += (notes[noteIndex].d / 1000) + 0.05;
-                noteIndex = (noteIndex + 1) % notes.length;
-            }
-            if (isPlaying) {
-                setTimeout(schedule, 50);
+            try {
+                while (nextNoteTime < audioCtx.currentTime + 0.1 && isPlaying) {
+                    playNote(notes[noteIndex].f, nextNoteTime, notes[noteIndex].d / 1000);
+                    nextNoteTime += (notes[noteIndex].d / 1000) + 0.05;
+                    noteIndex = (noteIndex + 1) % notes.length;
+                }
+                if (isPlaying) {
+                    setTimeout(schedule, 50);
+                }
+            } catch (e) {
+                isPlaying = false;
             }
         }
         schedule();
@@ -256,19 +269,21 @@
 
     function playNote(freq, time, duration) {
         if(!audioCtx) return;
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.type = 'triangle';
-        osc.frequency.value = freq;
-        
-        gain.gain.setValueAtTime(0.05, time);
-        gain.gain.exponentialRampToValueAtTime(0.001, time + duration - 0.01);
-        
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        
-        osc.start(time);
-        osc.stop(time + duration);
+        try {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.value = freq;
+            
+            gain.gain.setValueAtTime(0.05, time);
+            gain.gain.exponentialRampToValueAtTime(0.001, time + duration - 0.01);
+            
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            
+            osc.start(time);
+            osc.stop(time + duration);
+        } catch (e) {}
     }
 
     function switchScreen(screenId) {
@@ -277,7 +292,14 @@
     }
 
     function startQuiz() {
-        startBGM();
+        // 게임 멈춤 현상 방지를 위한 에러 처리
+        try {
+            initAudio();
+            startBGM();
+        } catch (e) {
+            console.warn("오디오 재생 오류. 게임 진행을 계속합니다.");
+        }
+        
         switchScreen('quiz-screen');
         loadQuestion();
     }
@@ -313,12 +335,12 @@
             btnElement.classList.add('correct');
             document.getElementById('quiz-mascot').innerText = "😻";
             score += 10;
-            playSFX(600, 800, 0.1); // 정답 효과음
+            playSFX(600, 800, 0.1); 
         } else {
             btnElement.classList.add('wrong');
             buttons[qData.answer].classList.add('correct');
             document.getElementById('quiz-mascot').innerText = "😿";
-            playSFX(300, 200, 0.2); // 오답 효과음
+            playSFX(300, 200, 0.2); 
         }
 
         const expBox = document.getElementById('explanation-text');
@@ -337,6 +359,47 @@
     }
 
     function showResult() {
-        isPlaying = false; // BGM 정지
+        isPlaying = false; 
         switchScreen('result-screen');
-        document.getElementById('final-score
+        document.getElementById('final-score').innerText = `${score}점`;
+        
+        const msgBox = document.getElementById('result-message');
+        const mascot = document.getElementById('result-mascot');
+        
+        if (score === 100) {
+            msgBox.innerText = "완벽해요! 당신은 진정한 고양이 박사입니다!";
+            mascot.innerText = "👑😻👑";
+        } else if (score >= 70) {
+            msgBox.innerText = "참 잘했어요! 고양이를 아주 많이 사랑하시는군요!";
+            mascot.innerText = "😽💖";
+        } else if (score >= 40) {
+            msgBox.innerText = "좋아요! 이번 기회에 고양이에 대해 더 많이 알게 되었죠?";
+            mascot.innerText = "😺👍";
+        } else {
+            msgBox.innerText = "괜찮아요! 고양이의 매력은 이제부터 알아가면 되니까요!";
+            mascot.innerText = "😸💪";
+        }
+    }
+
+    function playSFX(freq1, freq2, time) {
+        if(!audioCtx) return;
+        try {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            
+            osc.frequency.setValueAtTime(freq1, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(freq2, audioCtx.currentTime + time);
+            
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + time);
+            
+            osc.start();
+            osc.stop(audioCtx.currentTime + time);
+        } catch (e) {}
+    }
+</script>
+
+</body>
+</html>
