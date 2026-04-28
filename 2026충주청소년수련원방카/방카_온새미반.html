@@ -26,47 +26,46 @@
             width: 90%;
             max-width: 500px;
             background: white;
-            padding: 20px;
-            border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            padding: 25px;
+            border-radius: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
             text-align: center;
         }
 
         .mascot {
-            font-size: 50px;
-            margin-bottom: 10px;
+            font-size: 60px;
+            margin-bottom: 15px;
+            display: block;
         }
 
         .progress {
-            font-size: 14px;
-            color: #666;
-            margin-bottom: 15px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #888;
+            margin-bottom: 20px;
         }
 
         .question {
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             font-weight: bold;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
+            line-height: 1.4;
             word-break: keep-all;
         }
 
         .options {
             display: grid;
-            gap: 10px;
+            gap: 12px;
         }
 
-        button {
-            padding: 15px;
-            font-size: 1rem;
-            border: 2px solid #ddd;
-            border-radius: 12px;
-            background: white;
+        button.opt-btn {
+            padding: 18px;
+            font-size: 1.1rem;
+            border: 2px solid #eee;
+            border-radius: 15px;
+            background: #fff;
             cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        button:active {
-            transform: scale(0.98);
+            transition: 0.2s;
         }
 
         .correct {
@@ -84,26 +83,29 @@
         #explanation {
             margin-top: 20px;
             padding: 15px;
-            background: #f9f9f9;
-            border-radius: 10px;
+            background: #fdf2f2;
+            border-radius: 12px;
             display: none;
-            font-size: 0.9rem;
-            line-height: 1.4;
+            font-size: 0.95rem;
+            color: #444;
+            border-left: 5px solid var(--primary-color);
         }
 
         #next-btn, #restart-btn {
-            margin-top: 20px;
+            margin-top: 25px;
+            padding: 15px;
             background: var(--primary-color);
             color: white;
             border: none;
+            border-radius: 15px;
             width: 100%;
+            font-size: 1.1rem;
             font-weight: bold;
             display: none;
+            cursor: pointer;
         }
 
-        .result-screen {
-            display: none;
-        }
+        .result-screen { display: none; }
     </style>
 </head>
 <body>
@@ -111,26 +113,117 @@
 <div id="quiz-container">
     <div id="game-view">
         <div class="mascot">👹</div>
-        <div class="progress" id="progress">문제 1 / 20</div>
-        <div class="question" id="question">질문이 여기에 표시됩니다.</div>
-        <div class="options" id="options">
-            </div>
+        <div class="progress" id="progress">불러오는 중...</div>
+        <div class="question" id="question">준비되셨나요?</div>
+        <div class="options" id="options"></div>
         <div id="explanation"></div>
-        <button id="next-btn">다음 문제로!</button>
+        <button id="next-btn">다음 문제 클릭! 👉</button>
     </div>
 
     <div id="result-view" class="result-screen">
-        <div class="mascot">🎊</div>
-        <h2>퀴즈 종료!</h2>
-        <p style="font-size: 1.5rem; font-weight: bold;" id="score-text"></p>
-        <button id="restart-btn" style="display: block;">다시 도전하기</button>
+        <div class="mascot">🏆</div>
+        <h2>도깨비 퀴즈 결과</h2>
+        <p style="font-size: 1.5rem; color: var(--primary-color);" id="score-text"></p>
+        <button id="restart-btn" style="display: block;">다시 시작하기</button>
     </div>
 </div>
 
 <script>
     const quizData = [
-        { q: "야구에서 타자가 친 공이 담장을 넘어가면 무엇이라고 할까요?", a: ["홈런", "안타", "파울", "아웃"], c: 0, e: "펜스를 넘기면 홈런이라고 부르며 베이스를 모두 돌 수 있어요!" },
-        { q: "축구에서 골키퍼만 할 수 있는 행동은?", a: ["손으로 공 잡기", "헤딩하기", "달리기", "발로 차기"], c: 0, e: "골키퍼는 페널티 에어리어 안에서 손을 사용할 수 있는 유일한 선수예요." },
-        { q: "합기도에서 자신을 보호하며 넘어지는 기술은?", a: ["낙법", "발차기", "찌르기", "던지기"], c: 0, e: "낙법은 몸을 다치지 않게 안전하게 땅에 닿는 기술이에요." },
-        { q: "달리기 시합에서 출발 신호를 알리는 기구는?", a: ["신호총", "호루라기", "깃발", "박수"], c: 0, e: "정식 시합에서는 신호총 소리에 맞춰 출발해요." },
-        { q: "자전거를 탈 때 머리를 보호하기 위해 써야 하는 것은?", a: ["헬멧", "모자", "헤드셋", "선글라스"], c:
+        { q: "야구에서 타자가 친 공이 담장을 넘어가면 무엇이라고 할까요?", a: ["홈런", "안타", "파울", "아웃"], c: 0, e: "담장을 넘기면 모든 베이스를 돌 수 있는 홈런이에요!" },
+        { q: "축구에서 골키퍼만 할 수 있는 행동은?", a: ["손으로 공 잡기", "헤딩하기", "달리기", "발로 차기"], c: 0, e: "골키퍼는 자기 팀 골대 앞 구역에서 손을 쓸 수 있어요." },
+        { q: "합기도에서 넘어질 때 몸을 보호하는 기술은?", a: ["낙법", "발차기", "찌르기", "숨기"], c: 0, e: "낙법을 잘 배워야 넘어질 때 다치지 않아요." },
+        { q: "자전거를 탈 때 머리를 보호하기 위해 써야 하는 것은?", a: ["헬멧", "모자", "헤드셋", "안경"], c: 0, e: "사고를 대비해 헬멧은 꼭 써야 합니다!" },
+        { q: "그림을 그릴 때 수채화 물감을 섞는 판의 이름은?", a: ["팔레트", "캔버스", "이젤", "붓통"], c: 0, e: "여러 색의 물감을 팔레트에서 섞어 사용해요." },
+        { q: "오토바이를 운전할 때 반드시 필요한 것은?", a: ["운전면허증", "장난감", "자전거", "가방"], c: 0, e: "오토바이는 면허가 있는 사람만 운전할 수 있어요." },
+        { q: "만들기 시간에 종이를 붙일 때 주로 쓰는 것은?", a: ["풀", "가위", "망치", "자"], c: 0, e: "종이끼리 붙일 때는 풀이나 테이프를 이용해요." },
+        { q: "달리기 시합에서 '제자리에' 다음 하는 말은?", a: ["차렷", "준비", "시작", "빨리"], c: 0, e: "정식 시합에서는 '제자리에 - 차렷 - 출발!' 순서예요." },
+        { q: "공부할 때 책과 눈 사이의 적당한 거리는?", a: ["30cm 정도", "5cm", "2m", "없음"], c: 0, e: "눈 건강을 위해 책은 조금 떨어져서 보세요." },
+        { q: "축구 경기에서 한 팀의 선수는 몇 명인가요?", a: ["11명", "5명", "9명", "7명"], c: 0, e: "축구는 한 팀당 11명의 선수가 뜁니다." },
+        { q: "야구에서 공을 던지는 사람을 무엇이라 하나요?", a: ["투수", "포수", "심판", "타자"], c: 0, e: "투수는 타자를 향해 공을 던지는 역할이에요." },
+        { q: "준비운동을 하는 가장 큰 이유는 무엇일까요?", a: ["부상 방지", "키 크기", "잠 깨기", "옷 자랑"], c: 0, e: "몸을 미리 풀어줘야 다치는 걸 막을 수 있어요." },
+        { q: "자전거 체인에 기름(윤활유)을 바르는 이유는?", a: ["부드럽게 하려고", "무겁게 하려고", "반짝이려고", "냄새나려고"], c: 0, e: "기름을 바르면 체인이 부드럽게 잘 돌아가요." },
+        { q: "합기도의 기본이 되는 마음가짐은?", a: ["예의", "욕심", "승부욕", "장난"], c: 0, e: "모든 운동은 상대를 존중하는 예의에서 시작해요." },
+        { q: "그림에서 밑그림을 그리는 단계를 무엇이라 하나요?", a: ["스케치", "채색", "완성", "감상"], c: 0, e: "연필로 연하게 바탕을 그리는 것을 스케치라고 해요." },
+        { q: "달리기에서 가장 빠른 속도로 뛰는 경기는?", a: ["단거리 달리기", "마라톤", "걷기", "산책"], c: 0, e: "100m 달리기 같은 단거리는 아주 빠르게 뛰어요." },
+        { q: "오토바이를 탈 때 신호를 지키지 않으면?", a: ["매우 위험함", "괜찮음", "상관없음", "재밌음"], c: 0, e: "교통 신호는 우리 모두의 안전 약속이에요." },
+        { q: "만들기 도구 중 칼을 쓸 때 주의할 점은?", a: ["손 조심", "눈 감기", "빨리하기", "던지기"], c: 0, e: "칼이나 가위는 손이 다치지 않게 천천히 써야 해요." },
+        { q: "야구에서 공을 치는 사람을 무엇이라 하나요?", a: ["타자", "포수", "투수", "외야수"], c: 0, e: "배트를 들고 공을 치는 선수가 타자예요." },
+        { q: "학교 공부가 끝난 뒤 다시 공부하는 것을 무엇이라 하나요?", a: ["복습", "예습", "결석", "졸기"], c: 0, e: "배운 내용을 다시 확인하는 것은 복습이에요." }
+    ];
+
+    let currentIdx = 0;
+    let score = 0;
+    let isAnswered = false;
+
+    function initQuiz() {
+        currentIdx = 0;
+        score = 0;
+        document.getElementById('game-view').style.display = 'block';
+        document.getElementById('result-view').style.display = 'none';
+        showQuestion();
+    }
+
+    function showQuestion() {
+        isAnswered = false;
+        const quiz = quizData[currentIdx];
+        document.getElementById('progress').innerText = `문제 ${currentIdx + 1} / ${quizData.length}`;
+        document.getElementById('question').innerText = quiz.q;
+        document.getElementById('explanation').style.display = 'none';
+        document.getElementById('next-btn').style.display = 'none';
+        
+        const optionsDiv = document.getElementById('options');
+        optionsDiv.innerHTML = '';
+
+        quiz.a.forEach((opt, i) => {
+            const btn = document.createElement('button');
+            btn.className = 'opt-btn';
+            btn.innerText = opt;
+            btn.onclick = () => checkAnswer(i, btn);
+            optionsDiv.appendChild(btn);
+        });
+    }
+
+    function checkAnswer(selectedIdx, btn) {
+        if (isAnswered) return;
+        isAnswered = true;
+
+        const correctIdx = quizData[currentIdx].c;
+        const allBtns = document.querySelectorAll('.opt-btn');
+
+        if (selectedIdx === correctIdx) {
+            btn.classList.add('correct');
+            score++;
+        } else {
+            btn.classList.add('wrong');
+            allBtns[correctIdx].classList.add('correct');
+        }
+
+        document.getElementById('explanation').innerText = "💡 해설: " + quizData[currentIdx].e;
+        document.getElementById('explanation').style.display = 'block';
+        document.getElementById('next-btn').style.display = 'block';
+    }
+
+    document.getElementById('next-btn').onclick = () => {
+        currentIdx++;
+        if (currentIdx < quizData.length) {
+            showQuestion();
+        } else {
+            showResult();
+        }
+    };
+
+    function showResult() {
+        document.getElementById('game-view').style.display = 'none';
+        document.getElementById('result-view').style.display = 'block';
+        document.getElementById('score-text').innerText = `${quizData.length}개 중에 ${score}개를 맞혔어요!`;
+    }
+
+    document.getElementById('restart-btn').onclick = initQuiz;
+
+    // 페이지 로드 시 실행
+    window.onload = initQuiz;
+</script>
+
+</body>
+</html>
