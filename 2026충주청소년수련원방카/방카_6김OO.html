@@ -6,254 +6,219 @@
     <title>6학년 1학기 영어 퀴즈 🌟</title>
     <style>
         :root {
-            --primary-color: #ffeb3b;
-            --secondary-color: #4caf50;
-            --error-color: #f44336;
-            --bg-color: #f0f4f8;
+            --primary: #FFD93D;
+            --secondary: #6BCB77;
+            --danger: #FF6B6B;
+            --accent: #4D96FF;
+            --bg: #F9F9F9;
         }
 
         body {
-            font-family: 'Nanum Gothic', sans-serif;
-            background-color: var(--bg-color);
+            font-family: 'Malgun Gothic', sans-serif;
+            background-color: var(--bg);
+            margin: 0;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            margin: 0;
-            padding: 20px;
-            box-sizing: border-box;
+            overflow-x: hidden;
         }
 
-        #quiz-container {
+        #app {
             background: white;
-            width: 100%;
-            max-width: 500px;
-            border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            width: 90%;
+            max-width: 450px;
+            border-radius: 25px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
             padding: 30px;
             text-align: center;
             position: relative;
         }
 
-        .mascot {
-            font-size: 50px;
-            margin-bottom: 10px;
+        .mascot { font-size: 60px; margin-bottom: 10px; animation: bounce 2s infinite; }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+        .progress-bar {
+            height: 10px;
+            background: #eee;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            overflow: hidden;
         }
 
-        .progress {
-            font-size: 0.9em;
-            color: #666;
-            margin-bottom: 20px;
+        .progress-fill {
+            height: 100%;
+            background: var(--accent);
+            width: 0%;
+            transition: width 0.3s;
         }
 
         .question {
-            font-size: 1.2em;
+            font-size: 1.3em;
             font-weight: bold;
-            margin-bottom: 20px;
-            line-height: 1.4;
+            margin-bottom: 25px;
+            word-break: keep-all;
         }
 
-        .options {
-            display: grid;
-            gap: 10px;
-        }
+        .options { display: flex; flex-direction: column; gap: 12px; }
 
-        button.option {
-            background: #fff;
-            border: 2px solid #ddd;
+        .btn-opt {
+            background: white;
+            border: 2px solid #eee;
             padding: 15px;
-            border-radius: 12px;
-            font-size: 1em;
+            border-radius: 15px;
+            font-size: 1.05em;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: 0.2s;
+            outline: none;
         }
 
-        button.option:hover {
-            background: #f9f9f9;
-        }
+        .btn-opt:active { transform: scale(0.98); }
 
-        button.correct {
-            background-color: var(--secondary-color) !important;
-            color: white;
-            border-color: var(--secondary-color);
-        }
-
-        button.wrong {
-            background-color: var(--error-color) !important;
-            color: white;
-            border-color: var(--error-color);
-        }
+        .correct { background-color: var(--secondary) !important; color: white; border-color: var(--secondary); }
+        .wrong { background-color: var(--danger) !important; color: white; border-color: var(--danger); }
 
         #explanation {
             margin-top: 20px;
             padding: 15px;
-            background: #e3f2fd;
-            border-radius: 10px;
+            background: #f0f7ff;
+            border-radius: 12px;
+            font-size: 0.95em;
+            color: #333;
             display: none;
             text-align: left;
-            font-size: 0.95em;
+            border-left: 5px solid var(--accent);
         }
 
-        #next-btn, #start-btn {
-            margin-top: 20px;
-            background: #2196f3;
+        .btn-main {
+            margin-top: 25px;
+            background: var(--accent);
             color: white;
             border: none;
-            padding: 15px 30px;
-            border-radius: 30px;
+            padding: 18px;
+            border-radius: 15px;
             font-size: 1.1em;
-            cursor: pointer;
+            font-weight: bold;
             width: 100%;
+            cursor: pointer;
         }
 
-        #result-screen {
-            display: none;
-        }
-
+        #result-screen { display: none; }
         .hidden { display: none; }
     </style>
 </head>
 <body>
 
-<div id="quiz-container">
+<div id="app">
     <div id="start-screen">
-        <div class="mascot">🐶</div>
-        <h1>영어 퀴즈 대모험!</h1>
-        <p>6학년 1학기 내용을 복습해봐요!</p>
-        <p style="font-size: 0.8em; color: #888;">(시작 버튼을 누르면 배경음악이 나옵니다)</p>
-        <button id="start-btn" onclick="startQuiz()">시작하기!</button>
+        <div class="mascot">🐥</div>
+        <h1 style="color: #444;">영어 퀴즈 대모험</h1>
+        <p style="color: #666; margin-bottom: 30px;">6학년 1학기 영어, 준비됐나요?</p>
+        <button class="btn-main" onclick="initGame()">🎶 음악과 함께 시작!</button>
     </div>
 
     <div id="quiz-screen" class="hidden">
-        <div class="mascot">✨</div>
-        <div class="progress" id="progress">문제 1 / 7</div>
-        <div class="question" id="question">질문이 여기에 표시됩니다.</div>
+        <div class="progress-bar"><div class="progress-fill" id="p-fill"></div></div>
+        <div class="mascot" id="q-mascot">📝</div>
+        <div class="question" id="q-text"></div>
         <div class="options" id="options"></div>
         <div id="explanation"></div>
-        <button id="next-btn" class="hidden" onclick="nextQuestion()">다음 문제로</button>
+        <button id="next-btn" class="btn-main hidden" onclick="goNext()">다음 문제로 ➔</button>
     </div>
 
     <div id="result-screen">
-        <div class="mascot">🏆</div>
-        <h2>참 잘했어요!</h2>
-        <div id="final-score" style="font-size: 2em; margin: 20px 0;">0 / 7</div>
-        <button id="restart-btn" onclick="location.reload()">다시 하기</button>
+        <div class="mascot" id="res-mascot">🌈</div>
+        <h2 id="res-title">참 잘했어요!</h2>
+        <div style="font-size: 2.5em; font-weight: bold; margin: 20px 0; color: var(--accent);" id="final-score">0 / 7</div>
+        <button class="btn-main" onclick="location.reload()">다시 도전하기</button>
     </div>
 </div>
 
 <audio id="bgm" loop preload="auto">
-    <source src="https://actions.google.com/sounds/v1/foley/wind_chime_vibrant.ogg" type="audio/ogg">
+    <source src="https://www.chosic.com/wp-content/uploads/2021/04/Funny-Song.mp3" type="audio/mpeg">
 </audio>
 
 <script>
     const questions = [
-        {
-            q: "질문에 알맞은 대답은? 'Where are you from?'",
-            a: ["I'm from Korea.", "I'm 13 years old.", "I'm happy.", "I'm a student."],
-            correct: 0,
-            exp: "출신 국가를 묻는 질문에는 'I'm from + 나라'로 답합니다."
-        },
-        {
-            q: "다음에 들어갈 말은? 'What ______ are you in?' (너는 몇 학년이니?)",
-            a: ["year", "class", "grade", "level"],
-            correct: 2,
-            exp: "학년을 물을 때는 'grade'라는 표현을 사용합니다."
-        },
-        {
-            q: "'나는 어제 축구를 했다'의 올바른 영어 표현은?",
-            a: ["I play soccer yesterday.", "I played soccer yesterday.", "I playing soccer yesterday.", "I plays soccer yesterday."],
-            correct: 1,
-            exp: "과거의 일은 동사 뒤에 -ed를 붙여 과거형(played)으로 표현합니다."
-        },
-        {
-            q: "'I want to be a pilot.'의 뜻은 무엇일까요?",
-            a: ["나는 조종사를 좋아한다.", "나는 조종사가 되고 싶다.", "나는 조종사를 보았다.", "나는 조종사다."],
-            correct: 1,
-            exp: "want to be ~는 '~가 되고 싶다'는 장래희망을 나타냅니다."
-        },
-        {
-            q: "'박물관은 어디에 있나요?'라고 물을 때 적절한 문장은?",
-            a: ["Where is the museum?", "How is the museum?", "What is the museum?", "Who is the museum?"],
-            correct: 0,
-            exp: "장소의 위치를 물을 때는 'Where is ~?'를 사용합니다."
-        },
-        {
-            q: "비교하는 문장 중 옳은 것은? (기린이 사자보다 크다)",
-            a: ["A giraffe is tall than a lion.", "A giraffe is more tall than a lion.", "A giraffe is taller than a lion.", "A giraffe is tallest than a lion."],
-            correct: 2,
-            exp: "두 대상을 비교할 때는 '형용사-er + than' 형태를 사용합니다."
-        },
-        {
-            q: "'도와줄까?'라고 제안할 때 쓰는 표현은?",
-            a: ["May I help you?", "Can you help me?", "What are you doing?", "I am sorry."],
-            correct: 0,
-            exp: "상대방을 도와주겠다고 정중히 제안할 때 'May I help you?'를 씁니다."
-        }
+        { q: "Where are you from? 에 대한 알맞은 답은?", a: ["I'm from Korea.", "I'm 13 years old.", "I'm happy.", "Yes, I am."], c: 0, e: "출신을 묻는 질문에는 'I'm from + 장소'를 씁니다." },
+        { q: "What ______ are you in? (너 몇 학년이니?)", a: ["year", "class", "grade", "level"], c: 2, e: "학년을 물을 때는 'grade'를 사용합니다." },
+        { q: "나는 어제 축구를 했다. (빈칸 채우기)\nI _______ soccer yesterday.", a: ["play", "plays", "playing", "played"], c: 3, e: "과거의 일은 동사 뒤에 -ed를 붙여 과거형으로 말해요." },
+        { q: "I want to be a pilot. 의 뜻은?", a: ["조종사를 좋아한다.", "조종사가 되고 싶다.", "조종사를 본 적 있다.", "조종사를 안다."], c: 1, e: "'want to be ~'는 장래희망(~이 되고 싶다)을 뜻해요." },
+        { q: "박물관 위치를 물어볼 때 알맞은 표현은?", a: ["Where is the museum?", "How is the museum?", "What is the museum?", "Who is the museum?"], c: 0, e: "장소를 물을 때는 'Where'로 시작합니다." },
+        { q: "사과가 포도보다 크다. (비교)\nAn apple is ______ than a grape.", a: ["big", "bigger", "biggest", "more big"], c: 1, e: "두 개를 비교할 때는 형용사 뒤에 -er을 붙여 'taller', 'bigger'처럼 써요." },
+        { q: "상대방을 도와줄까 제안하는 말은?", a: ["May I help you?", "Can you help me?", "What's up?", "No, thank you."], c: 0, e: "정중히 도움을 제안할 때는 'May I help you?'라고 합니다." }
     ];
 
-    let currentIdx = 0;
+    let current = 0;
     let score = 0;
-    let answered = false;
+    let isAnswered = false;
     const bgm = document.getElementById('bgm');
 
-    function startQuiz() {
+    function initGame() {
+        // 브라우저 정책상 클릭 이벤트 내부에서 오디오 컨텍스트를 재개해야 함
+        bgm.volume = 0.4;
+        const playPromise = bgm.play();
+        
+        if (playPromise !== undefined) {
+            playPromise.catch(error => {
+                console.log("Autoplay blocked. Retrying...");
+                // 수동 재생을 위한 재시도 로직
+                document.body.addEventListener('click', () => bgm.play(), { once: true });
+            });
+        }
+
         document.getElementById('start-screen').classList.add('hidden');
         document.getElementById('quiz-screen').classList.remove('hidden');
-        
-        // 브라우저 정책 상 사용자 클릭 후 재생 가능
-        bgm.volume = 0.5; // 볼륨 50%
-        bgm.play().catch(error => {
-            console.log("자동 재생이 차단되었습니다. 클릭 후 재생됩니다.", error);
-        });
-        
-        showQuestion();
+        renderQuestion();
     }
 
-    function showQuestion() {
-        const qData = questions[currentIdx];
-        document.getElementById('progress').innerText = `문제 ${currentIdx + 1} / ${questions.length}`;
-        document.getElementById('question').innerText = qData.q;
+    function renderQuestion() {
+        isAnswered = false;
+        const data = questions[current];
+        document.getElementById('p-fill').style.width = ((current + 1) / questions.length * 100) + '%';
+        document.getElementById('q-text').innerText = data.q;
         document.getElementById('explanation').style.display = 'none';
         document.getElementById('next-btn').classList.add('hidden');
         
-        const optionsDiv = document.getElementById('options');
-        optionsDiv.innerHTML = '';
+        const optionsArea = document.getElementById('options');
+        optionsArea.innerHTML = '';
         
-        qData.a.forEach((opt, i) => {
-            const btn = document.createElement('button');
-            btn.className = 'option';
-            btn.innerText = opt;
-            btn.onclick = () => checkAnswer(i, btn);
-            optionsDiv.appendChild(btn);
+        data.a.forEach((txt, i) => {
+            const b = document.createElement('button');
+            b.className = 'btn-opt';
+            b.innerText = txt;
+            b.onclick = () => select(i, b);
+            optionsArea.appendChild(b);
         });
-        answered = false;
     }
 
-    function checkAnswer(idx, btn) {
-        if(answered) return;
-        answered = true;
-
-        const correctIdx = questions[currentIdx].correct;
-        const allButtons = document.querySelectorAll('.option');
+    function select(idx, btn) {
+        if(isAnswered) return;
+        isAnswered = true;
+        const correctIdx = questions[current].c;
+        const allBtns = document.querySelectorAll('.btn-opt');
 
         if(idx === correctIdx) {
             btn.classList.add('correct');
             score++;
+            document.getElementById('q-mascot').innerText = "🎈";
         } else {
             btn.classList.add('wrong');
-            allButtons[correctIdx].classList.add('correct');
+            allBtns[correctIdx].classList.add('correct');
+            document.getElementById('q-mascot').innerText = "😮";
         }
 
-        const expDiv = document.getElementById('explanation');
-        expDiv.innerText = `💡 해설: ${questions[currentIdx].exp}`;
-        expDiv.style.display = 'block';
+        const exp = document.getElementById('explanation');
+        exp.innerText = `💡 Tip: ${questions[current].e}`;
+        exp.style.display = 'block';
         document.getElementById('next-btn').classList.remove('hidden');
     }
 
-    function nextQuestion() {
-        currentIdx++;
-        if(currentIdx < questions.length) {
-            showQuestion();
+    function goNext() {
+        current++;
+        if(current < questions.length) {
+            document.getElementById('q-mascot').innerText = "📝";
+            renderQuestion();
         } else {
             showResult();
         }
@@ -263,8 +228,19 @@
         document.getElementById('quiz-screen').classList.add('hidden');
         document.getElementById('result-screen').style.display = 'block';
         document.getElementById('final-score').innerText = `${score} / ${questions.length} 점`;
+        
+        const resMascot = document.getElementById('res-mascot');
+        const resTitle = document.getElementById('res-title');
+        
         if(score === questions.length) {
-            document.querySelector('#result-screen .mascot').innerText = "👑";
+            resMascot.innerText = "👑";
+            resTitle.innerText = "와우! 만점이에요!";
+        } else if (score >= 4) {
+            resMascot.innerText = "⭐";
+            resTitle.innerText = "참 잘했어요!";
+        } else {
+            resMascot.innerText = "💡";
+            resTitle.innerText = "조금 더 연습해봐요!";
         }
     }
 </script>
