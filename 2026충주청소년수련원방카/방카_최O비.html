@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>🌸 꽃말 퀴즈 🌸</title>
+
+<style>
+
+body {
+
+    font-family: 'Arial', sans-serif;
+
+    margin: 0;
+
+    padding: 0;
+
+    background: #fff5f8;
+
+    text-align: center;
+
+}
+
+.container {
+
+    padding: 20px;
+
+}
+
+h1 {
+
+    font-size: 24px;
+
+}
+
+.mascot {
+
+    font-size: 50px;
+
+}
+
+.question {
+
+    font-size: 20px;
+
+    margin: 20px 0;
+
+}
+
+.choice {
+
+    display: block;
+
+    padding: 12px;
+
+    margin: 8px 0;
+
+    border-radius: 10px;
+
+    border: none;
+
+    background: #eee;
+
+    font-size: 16px;
+
+}
+
+.choice.correct {
+
+    background: #b2f2bb;
+
+}
+
+.choice.wrong {
+
+    background: #ffa8a8;
+
+}
+
+.explanation {
+
+    margin-top: 10px;
+
+    font-size: 14px;
+
+}
+
+button {
+
+    padding: 10px 20px;
+
+    margin-top: 20px;
+
+    font-size: 16px;
+
+    border: none;
+
+    border-radius: 10px;
+
+    background: #ff8fab;
+
+    color: white;
+
+}
+
+.hidden {
+
+    display: none;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+
+
+<div class="container">
+
+    <div class="mascot">🌼🐰</div>
+
+    <h1>꽃말 맞추기 퀴즈</h1>
+
+
+
+    <div id="quiz"></div>
+
+    <div id="result" class="hidden"></div>
+
+</div>
+
+
+
+<script>
+
+const quizData = [
+
+{
+
+    q: "은방울꽃의 꽃말은?",
+
+    choices: ["순결", "슬픔", "행복", "질투"],
+
+    answer: 2,
+
+    exp: "은방울꽃은 '행복이 다시 찾아온다'는 의미를 가지고 있어요."
+
+},
+
+{
+
+    q: "장미의 꽃말은?",
+
+    choices: ["사랑", "우정", "희망", "기다림"],
+
+    answer: 0,
+
+    exp: "장미는 대표적으로 사랑을 의미해요."
+
+},
+
+{
+
+    q: "해바라기의 꽃말은?",
+
+    choices: ["집착", "숭배", "행복", "희망"],
+
+    answer: 1,
+
+    exp: "해바라기는 태양을 향하는 모습에서 숭배의 의미가 있어요."
+
+},
+
+{
+
+    q: "튤립의 꽃말은?",
+
+    choices: ["영원", "사랑의 고백", "희망", "용기"],
+
+    answer: 1,
+
+    exp: "튤립은 사랑을 고백할 때 자주 사용돼요."
+
+},
+
+{
+
+    q: "백합의 꽃말은?",
+
+    choices: ["순결", "질투", "슬픔", "분노"],
+
+    answer: 0,
+
+    exp: "백합은 순수하고 깨끗한 이미지를 상징해요."
+
+},
+
+{
+
+    q: "카네이션의 꽃말은?",
+
+    choices: ["감사", "행복", "질투", "미움"],
+
+    answer: 0,
+
+    exp: "카네이션은 감사의 마음을 표현할 때 사용돼요."
+
+},
+
+{
+
+    q: "라벤더의 꽃말은?",
+
+    choices: ["침묵", "불안", "행복", "질투"],
+
+    answer: 0,
+
+    exp: "라벤더는 침묵과 평온을 의미해요."
+
+},
+
+{
+
+    q: "코스모스의 꽃말은?",
+
+    choices: ["질서", "혼돈", "사랑", "슬픔"],
+
+    answer: 0,
+
+    exp: "코스모스는 조화와 질서를 상징해요."
+
+},
+
+{
+
+    q: "데이지의 꽃말은?",
+
+    choices: ["순수", "슬픔", "질투", "고통"],
+
+    answer: 0,
+
+    exp: "데이지는 순수함과 순결을 의미해요."
+
+},
+
+{
+
+    q: "국화의 꽃말은?",
+
+    choices: ["기쁨", "장수", "질투", "슬픔"],
+
+    answer: 1,
+
+    exp: "국화는 장수와 고귀함을 상징해요."
+
+}
+
+];
+
+
+
+let current = 0;
+
+let score = 0;
+
+
+
+function loadQuiz() {
+
+    const q = quizData[current];
+
+    const quizDiv = document.getElementById("quiz");
+
+    quizDiv.innerHTML = `
+
+        <div class="question">${current+1}. ${q.q}</div>
+
+        ${q.choices.map((c, i) => `<button class="choice" onclick="checkAnswer(${i})">${c}</button>`).join("")}
+
+        <div id="exp" class="explanation hidden"></div>
+
+    `;
+
+}
+
+
+
+function checkAnswer(i) {
+
+    const q = quizData[current];
+
+    const buttons = document.querySelectorAll(".choice");
+
+    buttons.forEach((btn, idx) => {
+
+        btn.disabled = true;
+
+        if (idx === q.answer) {
+
+            btn.classList.add("correct");
+
+        } else if (idx === i) {
+
+            btn.classList.add("wrong");
+
+        }
+
+    });
+
+
+
+    if (i === q.answer) score++;
+
+
+
+    const expDiv = document.getElementById("exp");
+
+    expDiv.classList.remove("hidden");
+
+    expDiv.innerText = q.exp;
+
+
+
+    setTimeout(() => {
+
+        current++;
+
+        if (current < quizData.length) {
+
+            loadQuiz();
+
+        } else {
+
+            showResult();
+
+        }
+
+    }, 1500);
+
+}
+
+
+
+function showResult() {
+
+    document.getElementById("quiz").classList.add("hidden");
+
+    const resultDiv = document.getElementById("result");
+
+    resultDiv.classList.remove("hidden");
+
+    resultDiv.innerHTML = `
+
+        <h2>🎉 결과 🎉</h2>
+
+        <p
