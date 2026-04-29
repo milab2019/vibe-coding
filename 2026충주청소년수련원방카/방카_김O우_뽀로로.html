@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>뽀로로 퀴즈</title>
+
+<style>
+
+body {
+
+  font-family: sans-serif;
+
+  background: #f0f8ff;
+
+  margin: 0;
+
+  padding: 20px;
+
+  text-align: center;
+
+}
+
+.container {
+
+  max-width: 500px;
+
+  margin: auto;
+
+  background: white;
+
+  border-radius: 20px;
+
+  padding: 20px;
+
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+
+}
+
+h1 {
+
+  font-size: 22px;
+
+}
+
+.question {
+
+  margin: 20px 0;
+
+}
+
+button {
+
+  display: block;
+
+  width: 100%;
+
+  margin: 8px 0;
+
+  padding: 12px;
+
+  border: none;
+
+  border-radius: 10px;
+
+  font-size: 16px;
+
+}
+
+.correct {
+
+  background-color: #a8e6a1;
+
+}
+
+.wrong {
+
+  background-color: #ffb3b3;
+
+}
+
+.next-btn {
+
+  background: #4da6ff;
+
+  color: white;
+
+}
+
+.mascot {
+
+  font-size: 40px;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+
+
+<div class="container">
+
+  <div class="mascot">🐧✨</div>
+
+  <h1>뽀로로 퀴즈</h1>
+
+  <div id="quiz"></div>
+
+</div>
+
+
+
+<script>
+
+const quizData = [
+
+  {
+
+    question: "뽀로로의 직업은?",
+
+    options: ["요리사", "파일럿", "경찰", "의사"],
+
+    answer: 1,
+
+    explanation: "뽀로로는 비행기를 좋아하는 파일럿이에요!"
+
+  },
+
+  {
+
+    question: "뽀로로의 친구가 아닌 것은?",
+
+    options: ["크롱", "루피", "해리", "도라에몽"],
+
+    answer: 3,
+
+    explanation: "도라에몽은 다른 애니메이션 캐릭터예요!"
+
+  },
+
+  {
+
+    question: "크롱은 어떤 동물일까요?",
+
+    options: ["공룡", "강아지", "고양이", "토끼"],
+
+    answer: 0,
+
+    explanation: "크롱은 귀여운 아기 공룡이에요!"
+
+  },
+
+  {
+
+    question: "루피의 특징은?",
+
+    options: ["수줍음 많음", "화 잘 냄", "엄청 빠름", "무서움"],
+
+    answer: 0,
+
+    explanation: "루피는 수줍고 귀여운 캐릭터예요!"
+
+  },
+
+  {
+
+    question: "뽀로로가 사는 곳은?",
+
+    options: ["사막", "숲 속 마을", "도시", "바다 속"],
+
+    answer: 1,
+
+    explanation: "눈 덮인 숲 속 마을에 살아요!"
+
+  }
+
+];
+
+
+
+let current = 0;
+
+let score = 0;
+
+
+
+function loadQuiz() {
+
+  const quiz = document.getElementById("quiz");
+
+  if (current >= quizData.length) {
+
+    quiz.innerHTML = `
+
+      <h2>🎉 결과 🎉</h2>
+
+      <p>${score} / ${quizData.length} 점</p>
+
+      <button onclick="location.reload()">다시하기</button>
+
+    `;
+
+    return;
+
+  }
+
+
+
+  const q = quizData[current];
+
+  quiz.innerHTML = `
+
+    <div class="question">${current + 1}. ${q.question}</div>
+
+    ${q.options.map((opt, i) => `
+
+      <button onclick="selectAnswer(${i})">${opt}</button>
+
+    `).join("")}
+
+    <div id="explanation"></div>
+
+  `;
+
+}
+
+
+
+function selectAnswer(index) {
+
+  const buttons = document.querySelectorAll("button");
+
+  const q = quizData[current];
+
+
+
+  buttons.forEach((btn, i) => {
+
+    btn.disabled = true;
+
+    if (i === q.answer) btn.classList.add("correct");
+
+    else if (i === index) btn.classList.add("wrong");
+
+  });
+
+
+
+  if (index === q.answer) score++;
+
+
+
+  document.getElementById("explanation").innerHTML = `
+
+    <p>${q.explanation}</p>
+
+    <button class="next-btn" onclick<!DOCTYPE html>
+
+<html lang="ko">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>뽀로로 퀴즈</title>
+
+<style>
+
+body {
+
+  font-family: sans-serif;
+
+  background: #f0f8ff;
+
+  margin: 0;
+
+  padding: 20px;
+
+  text-align: center;
+
+}
+
+.container {
+
+  max-width: 500px;
+
+  margin: auto;
+
+  background: white;
+
+  border-radius: 20px;
+
+  padding: 20px;
+
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+
+}
+
+h1 {
+
+  font-size: 22px;
+
+}
+
+.question {
+
+  margin: 20px 0;
+
+}
+
+button {
+
+  display: block;
+
+  width: 100%;
+
+  margin: 8px 0;
+
+  padding: 12px;
+
+  border: none;
+
+  border-radius: 10px;
+
+  font-size: 16px;
+
+}
+
+.correct {
+
+  background-color: #a8e6a1;
+
+}
+
+.wrong {
+
+  background-color: #ffb3b3;
+
+}
+
+.next-btn {
+
+  background: #4da6ff;
+
+  color: white;
+
+}
+
+.mascot {
+
+  font-size: 40px;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+
+
+<div class="container">
+
+  <div class="mascot">🐧✨</div>
+
+  <h1>뽀로로 퀴즈</h1>
+
+  <div id="quiz"></div>
+
+</div>
+
+
+
+<script>
+
+const quizData = [
+
+  {
+
+    question: "뽀로로의 직업은?",
+
+    options: ["요리사", "파일럿", "경찰", "의사"],
+
+    answer: 1,
+
+    explanation: "뽀로로는 비행기를 좋아하는 파일럿이에요!"
+
+  },
+
+  {
+
+    question: "뽀로로의 친구가 아닌 것은?",
+
+    options: ["크롱", "루피", "해리", "도라에몽"],
+
+    answer: 3,
+
+    explanation: "도라에몽은 다른 애니메이션 캐릭터예요!"
+
+  },
+
+  {
+
+    question: "크롱은 어떤 동물일까요?",
+
+    options: ["공룡", "강아지", "고양이", "토끼"],
+
+    answer: 0,
+
+    explanation: "크롱은 귀여운 아기 공룡이에요!"
+
+  },
+
+  {
+
+    question: "루피의 특징은?",
+
+    options: ["수줍음 많음", "화 잘 냄", "엄청 빠름", "무서움"],
+
+    answer: 0,
+
+    explanation: "루피는 수줍고 귀여운 캐릭터예요!"
+
+  },
+
+  {
+
+    question: "뽀로로가 사는 곳은?",
+
+    options: ["사막", "숲 속 마을", "도시", "바다 속"],
+
+    answer: 1,
+
+    explanation: "눈 덮인 숲 속 마을에 살아요!"
+
+  }
+
+];
+
+
+
+let current = 0;
+
+let score = 0;
+
+
+
+function loadQuiz() {
+
+  const quiz = document.getElementById("quiz");
+
+  if (current >= quizData.length) {
+
+    quiz.innerHTML = `
+
+      <h2>🎉 결과 🎉</h2>
+
+      <p>${score} / ${quizData.length} 점</p>
+
+      <button onclick="location.reload()">다시하기</button>
+
+    `;
+
+    return;
+
+  }
+
+
+
+  const q = quizData[current];
+
+  quiz.innerHTML = `
+
+    <div class="question">${current + 1}. ${q.question}</div>
+
+    ${q.options.map((opt, i) => `
+
+      <button onclick="selectAnswer(${i})">${opt}</button>
+
+    `).join("")}
+
+    <div id="explanation"></div>
+
+  `;
+
+}
+
+
+
+function selectAnswer(index) {
+
+  const buttons = document.querySelectorAll("button");
+
+  const q = quizData[current];
+
+
+
+  buttons.forEach((btn, i) => {
+
+    btn.disabled = true;
+
+    if (i === q.answer) btn.classList.add("correct");
+
+    else if (i === index) btn.classList.add("wrong");
+
+  });
+
+
+
+  if (index === q.answer) score++;
+
+
+
+  document.getElementById("explanation").innerHTML = `
+
+    <p>${q.explanation}</p>
+
+    <button class="next-btn" onclick="nextQuestion()">다음</button>
+
+  `;
+
+}
+
+
+
+function nextQuestion() {
+
+  current++;
+
+  loadQuiz();
+
+}
+
+
+
+loadQuiz();
+
+</script>
+
+
+
+</body>
+
+</html>="nextQuestion()">다음</button>
+
+  `;
+
+}
+
+
+
+function nextQuestion() {
+
+  current++;
+
+  loadQuiz();
+
+}
+
+
+
+loadQuiz();
+
+</script>
+
+
+
+</body>
+
+</html>
