@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>한유진 퀴즈</title>
+
+<style>
+
+body {
+
+  font-family: Arial, sans-serif;
+
+  background: #fef6ff;
+
+  margin: 0;
+
+  padding: 0;
+
+  text-align: center;
+
+}
+
+.container {
+
+  padding: 20px;
+
+}
+
+h1 {
+
+  color: #6a0dad;
+
+}
+
+.mascot {
+
+  font-size: 50px;
+
+}
+
+.question {
+
+  font-size: 18px;
+
+  margin: 20px 0;
+
+}
+
+button {
+
+  display: block;
+
+  width: 100%;
+
+  padding: 12px;
+
+  margin: 8px 0;
+
+  border: none;
+
+  border-radius: 10px;
+
+  font-size: 16px;
+
+}
+
+.correct {
+
+  background-color: #4caf50;
+
+  color: white;
+
+}
+
+.wrong {
+
+  background-color: #f44336;
+
+  color: white;
+
+}
+
+.default {
+
+  background-color: #eee;
+
+}
+
+.explanation {
+
+  margin-top: 10px;
+
+  font-size: 14px;
+
+}
+
+.result {
+
+  font-size: 22px;
+
+  margin-top: 20px;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="mascot">🐰✨</div>
+
+  <h1>한유진 퀴즈</h1>
+
+  <div id="quiz"></div>
+
+</div>
+
+<script>
+
+const quizData = [
+
+  {
+
+    question: "한유진이 속한 그룹은?",
+
+    options: ["제로베이스원", "세븐틴", "엔시티", "스트레이키즈"],
+
+    answer: 0,
+
+    explanation: "한유진은 제로베이스원(ZB1) 멤버입니다."
+
+  },
+
+  {
+
+    question: "한유진의 포지션으로 가장 알맞은 것은?",
+
+    options: ["메인보컬", "센터/비주얼", "메인래퍼", "프로듀서"],
+
+    answer: 1,
+
+    explanation: "한유진은 비주얼과 센터 포지션으로 주목받고 있습니다."
+
+  },
+
+  {
+
+    question: "한유진이 주목받게 된 프로그램은?",
+
+    options: ["프로듀스101", "보이즈 플래닛", "쇼미더머니", "아이돌학교"],
+
+    answer: 1,
+
+    explanation: "보이즈 플래닛을 통해 데뷔했습니다."
+
+  },
+
+  {
+
+    question: "한유진의 이미지로 가장 가까운 것은?",
+
+    options: ["강렬 카리스마", "청순 귀여움", "힙합 스타일", "섹시 콘셉트"],
+
+    answer: 1,
+
+    explanation: "귀엽고 청순한 이미지가 특징입니다."
+
+  },
+
+  {
+
+    question: "한유진의 매력으로 팬들이 자주 언급하는 것은?",
+
+    options: ["귀여운 표정", "낮은 목소리", "작곡 실력", "연기력"],
+
+    answer: 0,
+
+    explanation: "귀여운 표정과 분위기가 대표적인 매력입니다."
+
+  }
+
+];
+
+let current = 0;
+
+let score = 0;
+
+function loadQuiz() {
+
+  const quiz = document.getElementById("quiz");
+
+  if (current >= quizData.length) {
+
+    quiz.innerHTML = `
+
+      <div class="result">🎉 점수: ${score} / ${quizData.length}</div>
+
+      <button onclick="location.reload()">다시하기</button>
+
+    `;
+
+    return;
+
+  }
+
+  const q = quizData[current];
+
+  quiz.innerHTML = `
+
+    <div class="question">${current + 1}. ${q.question}</div>
+
+    ${q.options.map((opt, i) => 
+
+      `<button class="default" onclick="checkAnswer(${i})">${opt}</button>`
+
+    ).join("")}
+
+    <div id="explanation" class="explanation"></div>
+
+  `;
+
+}
+
+function checkAnswer(selected) {
+
+  const buttons = document.querySelectorAll("button");
+
+  const correct = quizData[current].answer;
+
+  buttons.forEach((btn, i) => {
+
+    btn.disabled = true;
+
+    if (i === correct) btn.classList.add("correct");
+
+    else if (i === selected) btn.classList.add("wrong");
+
+  });
+
+  if (selected === correct) score++;
+
+  document.getElementById("explanation").innerText = quizData[current].explanation;
+
+  setTimeout(() => {
+
+    current++;
+
+    loadQuiz();
+
+  }, 1500);
+
+}
+
+loadQuiz();
+
+</script>
+
+</body>
+
+</html>
