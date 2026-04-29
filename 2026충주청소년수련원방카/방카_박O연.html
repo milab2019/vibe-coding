@@ -8,97 +8,103 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>과자 퀴즈 🍪</title>
+<title>한유진 퀴즈</title>
 
 <style>
 
 body {
 
-    font-family: 'Arial', sans-serif;
+  font-family: Arial, sans-serif;
 
-    background: #fff8f0;
+  background: #fff5f8;
 
-    text-align: center;
+  margin: 0;
 
-    margin: 0;
+  padding: 0;
 
-    padding: 0;
+  text-align: center;
 
 }
 
 .container {
 
-    padding: 20px;
+  padding: 20px;
 
 }
 
 h1 {
 
-    font-size: 24px;
+  color: #ff4da6;
+
+}
+
+.mascot {
+
+  font-size: 50px;
 
 }
 
 .question {
 
-    font-size: 18px;
+  font-size: 18px;
 
-    margin: 20px 0;
+  margin: 20px 0;
 
 }
 
 button {
 
-    display: block;
+  display: block;
 
-    width: 100%;
+  width: 100%;
 
-    margin: 8px 0;
+  padding: 12px;
 
-    padding: 12px;
+  margin: 8px 0;
 
-    border: none;
+  border: none;
 
-    border-radius: 10px;
+  border-radius: 12px;
 
-    font-size: 16px;
+  font-size: 16px;
 
-    background: #eee;
+}
+
+.default {
+
+  background-color: #eee;
 
 }
 
 .correct {
 
-    background-color: #8bc34a !important;
+  background-color: #4caf50;
 
-    color: white;
+  color: white;
 
 }
 
 .wrong {
 
-    background-color: #f44336 !important;
+  background-color: #f44336;
 
-    color: white;
-
-}
-
-.hidden {
-
-    display: none;
+  color: white;
 
 }
 
-#mascot {
+.explanation {
 
-    font-size: 50px;
+  margin-top: 10px;
+
+  font-size: 14px;
 
 }
 
-#explanation {
+.result {
 
-    margin-top: 15px;
+  font-size: 22px;
 
-    font-size: 14px;
+  margin-top: 20px;
 
 }
 
@@ -110,19 +116,13 @@ button {
 
 <div class="container">
 
-    <div id="mascot">🍪🐻</div>
+  <div class="mascot">🐥💖</div>
 
-    <h1>과자 퀴즈</h1>
+  <h1>한유진 퀴즈</h1>
 
-    <div id="quiz"></div>
-
-    <div id="explanation"></div>
-
-    <button id="nextBtn" class="hidden">다음 문제</button>
+  <div id="quiz"></div>
 
 </div>
-
-
 
 <script>
 
@@ -130,229 +130,195 @@ const quizData = [
 
 {
 
-q: "초코칩 쿠키의 주재료는?",
+question: "한유진이 속한 그룹은?",
 
-a: ["감자", "초콜릿", "치즈", "김"],
+options: ["제로베이스원", "엔시티", "세븐틴", "스트레이키즈"],
 
-correct: 1,
+answer: 0,
 
-ex: "초코칩 쿠키에는 초콜릿 칩이 들어갑니다."
-
-},
-
-{
-
-q: "감자로 만든 과자는?",
-
-a: ["젤리", "사탕", "포테이토칩", "초콜릿"],
-
-correct: 2,
-
-ex: "포테이토칩은 감자를 얇게 썰어 만든 과자입니다."
+explanation: "한유진은 제로베이스원(ZB1)의 멤버입니다."
 
 },
 
 {
 
-q: "젤리는 어떤 식감?",
+question: "한유진이 데뷔하게 된 프로그램은?",
 
-a: ["딱딱함", "바삭함", "쫀득함", "부드러움"],
+options: ["프로듀스101", "보이즈 플래닛", "아이랜드", "쇼미더머니"],
 
-correct: 2,
+answer: 1,
 
-ex: "젤리는 쫀득쫀득한 식감이 특징입니다."
-
-},
-
-{
-
-q: "초콜릿의 주원료는?",
-
-a: ["밀", "코코아", "쌀", "옥수수"],
-
-correct: 1,
-
-ex: "초콜릿은 코코아로 만듭니다."
+explanation: "보이즈 플래닛을 통해 데뷔했습니다."
 
 },
 
 {
 
-q: "콘 과자의 주재료는?",
+question: "한유진의 대표 이미지로 알맞은 것은?",
 
-a: ["옥수수", "밀", "감자", "쌀"],
+options: ["귀여움", "강렬함", "카리스마", "섹시함"],
 
-correct: 0,
+answer: 0,
 
-ex: "콘 과자는 옥수수로 만듭니다."
-
-},
-
-{
-
-q: "과자가 바삭한 이유는?",
-
-a: ["물이 많아서", "기름에 튀겨서", "얼려서", "끓여서"],
-
-correct: 1,
-
-ex: "기름에 튀기면 바삭해집니다."
+explanation: "귀엽고 밝은 이미지가 대표적입니다."
 
 },
 
 {
 
-q: "사탕은 주로 무엇으로 만들까?",
+question: "한유진의 포지션으로 가장 가까운 것은?",
 
-a: ["설탕", "소금", "간장", "식초"],
+options: ["메인래퍼", "센터/비주얼", "메인보컬", "프로듀서"],
 
-correct: 0,
+answer: 1,
 
-ex: "사탕은 설탕을 녹여 만듭니다."
-
-},
-
-{
-
-q: "비스킷과 가장 비슷한 것은?",
-
-a: ["쿠키", "김", "젤리", "사탕"],
-
-correct: 0,
-
-ex: "비스킷과 쿠키는 비슷한 종류입니다."
+explanation: "센터와 비주얼 포지션으로 많은 주목을 받았습니다."
 
 },
 
 {
 
-q: "초코파이에 들어가는 것은?",
+question: "한유진의 매력으로 팬들이 자주 언급하는 것은?",
 
-a: ["마시멜로", "치즈", "김치", "고기"],
+options: ["귀여운 표정", "낮은 목소리", "작곡 실력", "연기력"],
 
-correct: 0,
+answer: 0,
 
-ex: "초코파이에는 마시멜로가 들어갑니다."
+explanation: "귀여운 표정과 분위기가 대표적인 매력입니다."
 
 },
 
 {
 
-q: "건강한 간식으로 비교적 좋은 것은?",
+question: "제로베이스원의 활동 특징은?",
 
-a: ["과일칩", "사탕", "초콜릿", "카라멜"],
+options: ["영구 그룹", "프로젝트 그룹", "솔로 활동", "밴드"],
 
-correct: 0,
+answer: 1,
 
-ex: "과일칩은 비교적 건강한 간식입니다."
+explanation: "제로베이스원은 프로젝트 그룹입니다."
+
+},
+
+{
+
+question: "한유진이 주목받은 이유는?",
+
+options: ["비주얼과 실력", "나이만", "운", "키"],
+
+answer: 0,
+
+explanation: "비주얼과 실력을 동시에 인정받았습니다."
+
+},
+
+{
+
+question: "한유진의 팬들이 좋아하는 성격은?",
+
+options: ["밝고 순수함", "차가움", "무뚝뚝함", "과묵함"],
+
+answer: 0,
+
+explanation: "밝고 순수한 성격으로 사랑받고 있습니다."
+
+},
+
+{
+
+question: "제로베이스원의 줄임말은?",
+
+options: ["ZB1", "ZBO", "ZBB", "Z1"],
+
+answer: 0,
+
+explanation: "ZB1로 줄여 부릅니다."
+
+},
+
+{
+
+question: "한유진의 대표적인 특징은?",
+
+options: ["귀여운 비주얼", "강한 랩", "기타 연주", "작곡"],
+
+answer: 0,
+
+explanation: "귀여운 비주얼이 큰 특징입니다."
 
 }
 
 ];
 
-
-
 let current = 0;
 
 let score = 0;
 
-
-
-const quizEl = document.getElementById("quiz");
-
-const nextBtn = document.getElementById("nextBtn");
-
-const explanationEl = document.getElementById("explanation");
-
-
-
 function loadQuiz() {
 
-    explanationEl.innerHTML = "";
+  const quiz = document.getElementById("quiz");
 
-    nextBtn.classList.add("hidden");
+  if (current >= quizData.length) {
 
+    quiz.innerHTML = `
 
+      <div class="result">🎉 점수: ${score} / ${quizData.length}</div>
 
-    const data = quizData[current];
+      <button onclick="location.reload()">다시하기</button>
 
-    quizEl.innerHTML = `
+    `;
 
-        <div class="question">${current + 1}. ${data.q}</div>
+    return;
 
-        ${data.a.map((choice, index) =>
+  }
 
-            `<button onclick="selectAnswer(${index})">${choice}</button>`
+  const q = quizData[current];
 
-        ).join("")}
+  quiz.innerHTML = `
 
-    `;
+    <div class="question">${current + 1}. ${q.question}</div>
 
-}
+    ${q.options.map((opt, i) => 
 
+      `<button class="default" onclick="checkAnswer(${i})">${opt}</button>`
 
+    ).join("")}
 
-function selectAnswer(selected) {
+    <div id="explanation" class="explanation"></div>
 
-    const buttons = document.querySelectorAll("button");
-
-    const correct = quizData[current].correct;
-
-
-
-    buttons.forEach((btn, idx) => {
-
-        if (idx === correct) btn.classList.add("correct");
-
-        else if (idx === selected) btn.classList.add("wrong");
-
-        btn.disabled = true;
-
-    });
-
-
-
-    if (selected === correct) score++;
-
-
-
-    explanationEl.innerHTML = quizData[current].ex;
-
-    nextBtn.classList.remove("hidden");
+  `;
 
 }
 
+function checkAnswer(selected) {
 
+  const buttons = document.querySelectorAll("button");
 
-nextBtn.addEventListener("click", () => {
+  const correct = quizData[current].answer;
 
-    current++;
+  buttons.forEach((btn, i) => {
 
-    if (current < quizData.length) {
+    btn.disabled = true;
 
-        loadQuiz();
+    if (i === correct) btn.classList.add("correct");
 
-    } else {
+    else if (i === selected) btn.classList.add("wrong");
 
-        showResult();
+  });
 
-    }
+  if (selected === correct) score++;
 
-});
+  document.getElementById("explanation").innerText = quizData[current].explanation;
 
+  setTimeout(() => {
 
+    current++;
 
-function showResult() {
+    loadQuiz();
 
-    quizEl.innerHTML = `<h2>결과 🎉</h2><p>${score} / ${quizData.length} 점</p>`;
-
-    explanationEl.innerHTML = "수고했어요! 🍪✨";
-
-    nextBtn.style.display = "none";
+  }, 1500);
 
 }
-
-
 
 loadQuiz();
 
