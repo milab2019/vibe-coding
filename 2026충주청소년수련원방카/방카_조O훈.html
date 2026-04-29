@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>🎮 게임 상식 퀴즈 🎮</title>
+
+    <style>
+
+        :root {
+
+            --primary-color: #6c5ce7;
+
+            --secondary-color: #a29bfe;
+
+            --success-color: #2ecc71;
+
+            --error-color: #e74c3c;
+
+            --bg-color: #f8f9fa;
+
+            --text-color: #2d3436;
+
+        }
+
+
+
+        body {
+
+            font-family: 'Pretendard', sans-serif;
+
+            background-color: var(--bg-color);
+
+            color: var(--text-color);
+
+            display: flex;
+
+            justify-content: center;
+
+            align-items: center;
+
+            min-height: 100vh;
+
+            margin: 0;
+
+            padding: 20px;
+
+            box-sizing: border-box;
+
+        }
+
+
+
+        #quiz-container {
+
+            background: white;
+
+            width: 100%;
+
+            max-width: 500px;
+
+            padding: 2rem;
+
+            border-radius: 20px;
+
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+
+            text-align: center;
+
+        }
+
+
+
+        .mascot {
+
+            font-size: 3rem;
+
+            margin-bottom: 1rem;
+
+            display: block;
+
+        }
+
+
+
+        h1 { font-size: 1.5rem; margin-bottom: 1.5rem; }
+
+
+
+        .question {
+
+            font-size: 1.2rem;
+
+            font-weight: bold;
+
+            margin-bottom: 1.5rem;
+
+            word-break: keep-all;
+
+        }
+
+
+
+        .options {
+
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 10px;
+
+        }
+
+
+
+        .option-btn {
+
+            padding: 12px 20px;
+
+            font-size: 1rem;
+
+            border: 2px solid var(--secondary-color);
+
+            border-radius: 12px;
+
+            background: white;
+
+            cursor: pointer;
+
+            transition: all 0.2s;
+
+        }
+
+
+
+        .option-btn:hover { background: var(--bg-color); }
+
+        .option-btn.correct { background-color: var(--success-color); border-color: var(--success-color); color: white; }
+
+        .option-btn.wrong { background-color: var(--error-color); border-color: var(--error-color); color: white; }
+
+        .option-btn:disabled { cursor: default; }
+
+
+
+        #explanation {
+
+            margin-top: 1.5rem;
+
+            padding: 1rem;
+
+            background: #f1f2f6;
+
+            border-radius: 10px;
+
+            display: none;
+
+            font-size: 0.95rem;
+
+            line-height: 1.5;
+
+        }
+
+
+
+        #next-btn {
+
+            margin-top: 1.5rem;
+
+            width: 100%;
+
+            padding: 12px;
+
+            background: var(--primary-color);
+
+            color: white;
+
+            border: none;
+
+            border-radius: 12px;
+
+            font-size: 1rem;
+
+            font-weight: bold;
+
+            display: none;
+
+            cursor: pointer;
+
+        }
+
+
+
+        #result-screen { display: none; }
+
+        .score { font-size: 2rem; font-weight: bold; color: var(--primary-color); margin: 1rem 0; }
+
+        
+
+        .progress {
+
+            font-size: 0.8rem;
+
+            color: #888;
+
+            margin-bottom: 0.5rem;
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+
+
+<div id="quiz-container">
+
+    <div id="quiz-screen">
+
+        <span class="mascot">🕹️</span>
+
+        <div class="progress" id="progress">1 / 5</div>
+
+        <div class="question" id="question">문제를 불러오는 중...</div>
+
+        <div class="options" id="options"></div>
+
+        <div id="explanation"></div>
+
+        <button id="next-btn" onclick="nextQuestion()">다음 문제</button>
+
+    </div>
+
+
+
+    <div id="result-screen">
+
+        <span class="mascot">🏆</span>
+
+        <h1>퀴즈 종료!</h1>
+
+        <div class="score" id="final-score">0 / 5</div>
+
+        <p id="result-comment"></p>
+
+        <button class="option-btn" style="width:100%" onclick="location.reload()">다시 하기</button>
+
+    </div>
+
+</div>
+
+
+
+<script>
+
+    const quizData = [
+
+        {
+
+            q: "세계에서 가장 많이 팔린 비디오 게임은?",
+
+            a: ["마인크래프트", "테트리스", "GTA V", "슈퍼 마리오 브라더스"],
+
+            correct: 0,
+
+            exp: "마인크래프트는 전 세계적으로 약 3억 장 이상 판매되어 역대 1위를 기록하고 있습니다."
+
+        },
+
+        {
+
+            q: "닌텐도의 마스코트 '마리오'의 원래 직업은?",
+
+            a: ["요리사", "배관공", "목수", "청소부"],
+
+            correct: 2,
+
+            exp: "마리오는 1981년 '동키콩'에 처음 등장했을 당시 건설 현장에서 일하는 '목수'였습니다. 이후 슈퍼 마리오 시리즈에서 배관공으로 설정되었습니다."
+
+        },
+
+        {
+
+            q: "다음 중 '리그 오브 레전드'의 제작사는?",
+
+            a: ["블리자드", "넥슨", "라이엇 게임즈", "유비소프트"],
+
+            correct: 2,
+
+            exp: "리그 오브 레전드(LoL)는 라이엇 게임즈(Riot Games)에서 개발 및 서비스하는 게임입니다."
+
+        },
+
+        {
+
+            q: "배틀그라운드(PUBG)에서 최후의 1인이 되었을 때 나오는 문구는?",
+
+            a: ["승리!", "치킨이닭!", "Winner!", "임무 완료"],
+
+            correct: 1,
+
+            exp: "유명한 문구인 '이겼닭! 오늘 저녁은 치킨이닭!'은 배틀그라운드의 승리 상징이 되었습니다."
+
+        },
+
+        {
+
+            q: "포켓몬스터 시리즈에서 피카츄의 도감 번호는?",
+
+            a: ["1번", "25번", "50번", "151번"],
+
+            correct: 1,
+
+            exp: "피카츄의 전국 도감 번호는 025번입니다. (참고로 1번은 이상해씨입니다.)"
+
+        }
+
+    ];
+
+
+
+    let currentIdx = 0;
+
+    let score = 0;
+
+
+
+    const questionEl = document.getElementById('question');
+
+    const optionsEl = document.getElementById('options');
+
+    const explanationEl = document.getElementById('explanation');
+
+    const nextBtn = document.getElementById('next-btn');
+
+    const progressEl = document.getElementById('progress');
+
+
+
+    function loadQuestion() {
+
+        const current = quizData[currentIdx];
+
+        questionEl.innerText = current.q;
+
+        progressEl.innerText = `${currentIdx + 1} / ${quizData.length}`;
+
+        optionsEl.innerHTML = '';
+
+        explanationEl.style.display = 'none';
+
+        nextBtn.style.display = 'none';
+
+
+
+        current.a.forEach((opt, i) => {
+
+            const btn = document.createElement('button');
+
+            btn.classList.add('option-btn');
+
+            btn.innerText = opt;
+
+            btn.onclick = () => checkAnswer(i);
+
+            optionsEl.appendChild(btn);
+
+        });
+
+    }
+
+
+
+    function checkAnswer(selectedIdx) {
+
+        const correctIdx = quizData[currentIdx].correct;
+
+        const buttons = optionsEl.querySelectorAll('.option-btn');
+
+        
+
+        buttons.forEach((btn, i) => {
+
+            btn.disabled = true;
+
+            if (i === correctIdx) btn.classList.add('correct');
+
+            else if (i === selectedIdx) btn.classList.add('wrong');
+
+        });
+
+
+
+        if (selectedIdx === correctIdx) score++;
+
+
+
+        explanationEl.innerText = `💡 해설: ${quizData[currentIdx].exp}`;
+
+        explanationEl.style.display = 'block';
+
+        nextBtn.style.display = 'block';
+
+        
+
+        if (currentIdx === quizData.length - 1) {
+
+            nextBtn.innerText = "결과 보기";
+
+        }
+
+    }
+
+
+
+    function nextQuestion() {
+
+        currentIdx++;
+
+        if (currentIdx < quizData.length) {
+
+            loadQuestion();
+
+        } else {
+
+            showResult();
+
+        }
+
+    }
+
+
+
+    function showResult() {
+
+        document.getElementById('quiz-screen').style.display = 'none';
+
+        document.getElementById('result-screen').style.display = 'block';
+
+        document.getElementById('final-score').innerText = `${score} / ${quizData.length}`;
+
+        
+
+        let comment = "";
+
+        if (score === 5) comment = "와우! 당신은 진정한 게임 고수군요! 👾";
+
+        else if (score >= 3) comment = "대단해요! 게임을 꽤 좋아하시네요! 🎮";
+
+        else comment = "조금 더 게임의 세계를 탐험해볼까요? 🐣";
+
+        document.getElementById('result-comment').innerText = comment;
+
+    }
+
+
+
+    loadQuestion();
+
+</script>
+
+
+
+</body>
+
+</html>
