@@ -16,7 +16,7 @@ body {
 
   font-family: Arial, sans-serif;
 
-  background: #fef6ff;
+  background: #fff5f8;
 
   margin: 0;
 
@@ -34,7 +34,7 @@ body {
 
 h1 {
 
-  color: #6a0dad;
+  color: #ff4da6;
 
 }
 
@@ -64,9 +64,15 @@ button {
 
   border: none;
 
-  border-radius: 10px;
+  border-radius: 12px;
 
   font-size: 16px;
+
+}
+
+.default {
+
+  background-color: #eee;
 
 }
 
@@ -83,12 +89,6 @@ button {
   background-color: #f44336;
 
   color: white;
-
-}
-
-.default {
-
-  background-color: #eee;
 
 }
 
@@ -116,7 +116,7 @@ button {
 
 <div class="container">
 
-  <div class="mascot">🐰✨</div>
+  <div class="mascot">🐥💖</div>
 
   <h1>한유진 퀴즈</h1>
 
@@ -128,65 +128,125 @@ button {
 
 const quizData = [
 
-  {
+{
 
-    question: "한유진이 속한 그룹은?",
+question: "한유진이 속한 그룹은?",
 
-    options: ["제로베이스원", "세븐틴", "엔시티", "스트레이키즈"],
+options: ["제로베이스원", "엔시티", "세븐틴", "스트레이키즈"],
 
-    answer: 0,
+answer: 0,
 
-    explanation: "한유진은 제로베이스원(ZB1) 멤버입니다."
+explanation: "한유진은 제로베이스원(ZB1)의 멤버입니다."
 
-  },
+},
 
-  {
+{
 
-    question: "한유진의 포지션으로 가장 알맞은 것은?",
+question: "한유진이 데뷔하게 된 프로그램은?",
 
-    options: ["메인보컬", "센터/비주얼", "메인래퍼", "프로듀서"],
+options: ["프로듀스101", "보이즈 플래닛", "아이랜드", "쇼미더머니"],
 
-    answer: 1,
+answer: 1,
 
-    explanation: "한유진은 비주얼과 센터 포지션으로 주목받고 있습니다."
+explanation: "보이즈 플래닛을 통해 데뷔했습니다."
 
-  },
+},
 
-  {
+{
 
-    question: "한유진이 주목받게 된 프로그램은?",
+question: "한유진의 대표 이미지로 알맞은 것은?",
 
-    options: ["프로듀스101", "보이즈 플래닛", "쇼미더머니", "아이돌학교"],
+options: ["귀여움", "강렬함", "카리스마", "섹시함"],
 
-    answer: 1,
+answer: 0,
 
-    explanation: "보이즈 플래닛을 통해 데뷔했습니다."
+explanation: "귀엽고 밝은 이미지가 대표적입니다."
 
-  },
+},
 
-  {
+{
 
-    question: "한유진의 이미지로 가장 가까운 것은?",
+question: "한유진의 포지션으로 가장 가까운 것은?",
 
-    options: ["강렬 카리스마", "청순 귀여움", "힙합 스타일", "섹시 콘셉트"],
+options: ["메인래퍼", "센터/비주얼", "메인보컬", "프로듀서"],
 
-    answer: 1,
+answer: 1,
 
-    explanation: "귀엽고 청순한 이미지가 특징입니다."
+explanation: "센터와 비주얼 포지션으로 많은 주목을 받았습니다."
 
-  },
+},
 
-  {
+{
 
-    question: "한유진의 매력으로 팬들이 자주 언급하는 것은?",
+question: "한유진의 매력으로 팬들이 자주 언급하는 것은?",
 
-    options: ["귀여운 표정", "낮은 목소리", "작곡 실력", "연기력"],
+options: ["귀여운 표정", "낮은 목소리", "작곡 실력", "연기력"],
 
-    answer: 0,
+answer: 0,
 
-    explanation: "귀여운 표정과 분위기가 대표적인 매력입니다."
+explanation: "귀여운 표정과 분위기가 대표적인 매력입니다."
 
-  }
+},
+
+{
+
+question: "제로베이스원의 활동 특징은?",
+
+options: ["영구 그룹", "프로젝트 그룹", "솔로 활동", "밴드"],
+
+answer: 1,
+
+explanation: "제로베이스원은 프로젝트 그룹입니다."
+
+},
+
+{
+
+question: "한유진이 주목받은 이유는?",
+
+options: ["비주얼과 실력", "나이만", "운", "키"],
+
+answer: 0,
+
+explanation: "비주얼과 실력을 동시에 인정받았습니다."
+
+},
+
+{
+
+question: "한유진의 팬들이 좋아하는 성격은?",
+
+options: ["밝고 순수함", "차가움", "무뚝뚝함", "과묵함"],
+
+answer: 0,
+
+explanation: "밝고 순수한 성격으로 사랑받고 있습니다."
+
+},
+
+{
+
+question: "제로베이스원의 줄임말은?",
+
+options: ["ZB1", "ZBO", "ZBB", "Z1"],
+
+answer: 0,
+
+explanation: "ZB1로 줄여 부릅니다."
+
+},
+
+{
+
+question: "한유진의 대표적인 특징은?",
+
+options: ["귀여운 비주얼", "강한 랩", "기타 연주", "작곡"],
+
+answer: 0,
+
+explanation: "귀여운 비주얼이 큰 특징입니다."
+
+}
 
 ];
 
