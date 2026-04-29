@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>대한민국 과자 퀴즈</title>
+
+<style>
+
+body {
+
+  font-family: sans-serif;
+
+  background: #fff8f0;
+
+  margin: 0;
+
+  padding: 0;
+
+  text-align: center;
+
+}
+
+.container {
+
+  padding: 20px;
+
+}
+
+h1 {
+
+  font-size: 22px;
+
+}
+
+.question {
+
+  font-size: 18px;
+
+  margin: 20px 0;
+
+}
+
+.btn {
+
+  display: block;
+
+  width: 100%;
+
+  padding: 12px;
+
+  margin: 8px 0;
+
+  border: none;
+
+  border-radius: 10px;
+
+  font-size: 16px;
+
+  background: #eee;
+
+}
+
+.correct {
+
+  background: #a8e6a3 !important;
+
+}
+
+.wrong {
+
+  background: #f7a8a8 !important;
+
+}
+
+.hidden {
+
+  display: none;
+
+}
+
+#result {
+
+  font-size: 20px;
+
+}
+
+.mascot {
+
+  font-size: 40px;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="mascot">🍪🐰</div>
+
+  <h1>대한민국 과자 퀴즈</h1>
+
+  <div id="quiz"></div>
+
+  <div id="result" class="hidden"></div>
+
+</div>
+
+<script>
+
+const quizData = [
+
+{
+
+q:"초코파이를 만든 회사는?",
+
+a:["롯데","오리온","해태","크라운"],
+
+c:1,
+
+e:"초코파이는 오리온 대표 과자입니다!"
+
+},
+
+{
+
+q:"새우 모양 과자는?",
+
+a:["포카칩","새우깡","칸쵸","홈런볼"],
+
+c:1,
+
+e:"새우깡은 새우 모양 스낵이에요!"
+
+},
+
+{
+
+q:"감자칩 브랜드는?",
+
+a:["포카칩","초코송이","오징어집","쫄병스낵"],
+
+c:0,
+
+e:"포카칩은 대표 감자칩입니다."
+
+},
+
+{
+
+q:"초코가 들어간 작은 버섯 모양 과자는?",
+
+a:["칸쵸","초코송이","빈츠","마이쮸"],
+
+c:1,
+
+e:"초코송이는 버섯 모양이에요!"
+
+},
+
+{
+
+q:"안에 초코가 들어간 공 모양 과자는?",
+
+a:["홈런볼","초코파이","새우깡","꼬북칩"],
+
+c:0,
+
+e:"홈런볼은 속에 초코가 들어있어요."
+
+},
+
+{
+
+q:"겹겹이 바삭한 과자는?",
+
+a:["꼬북칩","포카칩","초코송이","빈츠"],
+
+c:0,
+
+e:"꼬북칩은 4겹 구조 과자입니다!"
+
+},
+
+{
+
+q:"비스킷 위에 초콜릿이 올라간 과자는?",
+
+a:["칸쵸","빈츠","마이쮸","새우깡"],
+
+c:1,
+
+e:"빈츠는 비스킷+초콜릿 조합이에요."
+
+},
+
+{
+
+q:"쫄깃한 사탕은?",
+
+a:["마이쮸","포카칩","홈런볼","초코파이"],
+
+c:0,
+
+e:"마이쮸는 쫄깃한 과일 사탕입니다."
+
+},
+
+{
+
+q:"작은 초코볼 과자는?",
+
+a:["칸쵸","꼬북칩","포카칩","새우깡"],
+
+c:0,
+
+e:"칸쵸는 초코볼 과자입니다!"
+
+},
+
+{
+
+q:"오징어 모양 과자는?",
+
+a:["오징어집","포카칩","빈츠","마이쮸"],
+
+c:0,
+
+e:"오징어집은 오징어 모양이에요!"
+
+}
+
+];
+
+let current = 0;
+
+let score = 0;
+
+function loadQuiz(){
+
+  const quiz = document.getElementById("quiz");
+
+  if(current >= quizData.length){
+
+    showResult();
+
+    return;
+
+  }
+
+  const data = quizData[current];
+
+  quiz.innerHTML = `
+
+    <div class="question">${current+1}. ${data.q}</div>
+
+    ${data.a.map((choice,i)=>`<button class="btn" onclick="check(${i})">${choice}</button>`).join("")}
+
+    <div id="explanation" class="hidden"></div>
+
+  `;
+
+}
+
+function check(i){
+
+  const buttons = document.querySelectorAll(".btn");
+
+  const correct = quizData[current].c;
+
+  buttons.forEach((btn,idx)=>{
+
+    btn.disabled = true;
+
+    if(idx === correct){
+
+      btn.classList.add("correct");
+
+    } else if(idx === i){
+
+      btn.classList.add("wrong");
+
+    }
+
+  });
+
+  if(i === correct) score++;
+
+  const exp = document.getElementById("explanation");
+
+  exp.classList.remove("hidden");
+
+  exp.innerHTML = "<p>"+quizData[current].e+"</p><button class='btn' onclick='next()'>다음</button>";
+
+}
+
+function next(){
+
+  current++;
+
+  loadQuiz();
+
+}
+
+function showResult(){
+
+  document.getElementById("quiz").classList.add("hidden");
+
+  const result = document.getElementById("result");
+
+  result.classList.remove("hidden");
+
+  result.innerHTML = `
+
+    <div class="mascot">🎉🐻</div>
+
+    <p>당신의 점수는 ${score} / ${quizData.length} 입니다!</p>
+
+  `;
+
+}
+
+loadQuiz();
+
+</script>
+
+</body>
+
+</html>
