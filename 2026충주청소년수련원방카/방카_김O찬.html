@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>TFT 시즌 13 완성 아이템 퀴즈</title>
+
+    <style>
+
+        :root {
+
+            --primary-bg: #0d1117;
+
+            --card-bg: #161b22;
+
+            --accent: #c8aa6e;
+
+            --correct: #2ea043;
+
+            --wrong: #f85149;
+
+            --text: #c9d1d9;
+
+        }
+
+        body {
+
+            font-family: 'Malgun Gothic', sans-serif;
+
+            background-color: var(--primary-bg);
+
+            color: var(--text);
+
+            margin: 0;
+
+            display: flex;
+
+            justify-content: center;
+
+            align-items: center;
+
+            min-height: 100vh;
+
+        }
+
+        #quiz-app {
+
+            width: 95%;
+
+            max-width: 500px;
+
+            background: var(--card-bg);
+
+            padding: 20px;
+
+            border-radius: 12px;
+
+            border: 1px solid var(--accent);
+
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+
+        }
+
+        .header {
+
+            text-align: center;
+
+            margin-bottom: 20px;
+
+        }
+
+        #progress {
+
+            font-size: 0.9rem;
+
+            color: var(--accent);
+
+            margin-bottom: 5px;
+
+        }
+
+        .effect-container {
+
+            background: #0d1117;
+
+            padding: 15px;
+
+            border-radius: 8px;
+
+            min-height: 100px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            text-align: center;
+
+            margin-bottom: 20px;
+
+            font-weight: bold;
+
+            line-height: 1.5;
+
+        }
+
+        input[type="text"] {
+
+            width: 100%;
+
+            padding: 12px;
+
+            box-sizing: border-box;
+
+            background: #0d1117;
+
+            border: 1px solid #30363d;
+
+            border-radius: 6px;
+
+            color: white;
+
+            font-size: 1rem;
+
+            margin-bottom: 15px;
+
+            text-align: center;
+
+        }
+
+        input:focus {
+
+            outline: none;
+
+            border-color: var(--accent);
+
+        }
+
+        button {
+
+            width: 100%;
+
+            padding: 12px;
+
+            background: var(--accent);
+
+            border: none;
+
+            border-radius: 6px;
+
+            color: #0d1117;
+
+            font-weight: bold;
+
+            font-size: 1rem;
+
+            cursor: pointer;
+
+        }
+
+        #feedback {
+
+            margin-top: 20px;
+
+            padding: 15px;
+
+            border-radius: 8px;
+
+            display: none;
+
+        }
+
+        .explanation {
+
+            font-size: 0.85rem;
+
+            margin-top: 8px;
+
+            color: #8b949e;
+
+        }
+
+        .hidden { display: none; }
+
+        .result-score {
+
+            font-size: 2.5rem;
+
+            color: var(--accent);
+
+            margin: 20px 0;
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+
+
+<div id="quiz-app">
+
+    <div id="quiz-screen">
+
+        <div class="header">
+
+            <div id="progress">1 / 15</div>
+
+            <h3 style="margin:5px 0;">아이템 맞추기</h3>
+
+        </div>
+
+        <div class="effect-container" id="effect-box"></div>
+
+        <input type="text" id="answer-input" placeholder="아이템 이름을 입력하세요" autocomplete="off">
+
+        <button id="action-btn" onclick="handleAction()">제출하기</button>
+
+        <div id="feedback">
+
+            <div id="status-text" style="font-weight: bold; font-size: 1.1rem;"></div>
+
+            <div class="explanation" id="exp-text"></div>
+
+        </div>
+
+    </div>
+
+
+
+    <div id="result-screen" class="hidden" style="text-align: center;">
+
+        <h2>퀴즈 결과</h2>
+
+        <div class="result-score" id="score-display">0 / 15</div>
+
+        <button onclick="location.reload()">다시 시작</button>
+
+    </div>
+
+</div>
+
+
+
+<script>
+
+    const questions = [
+
+        { q: "기본 공격 시 5의 추가 마나를 획득합니다.", a: "쇼진의창", e: "BF대검 + 여눈. 스킬을 자주 쓰는 챔피언에게 필수입니다." },
+
+        { q: "추가 공격 속도를 획득합니다. 공격할 때마다 공격 속도가 5%씩 중첩됩니다.", a: "구인수의격노검", e: "곡궁 + 쓸지. 전투가 길어질수록 강력해집니다." },
+
+        { q: "스킬 피해에 치명타가 적용될 수 있습니다. 추가 주문력과 치명타 확률을 얻습니다.", a: "보석건틀릿", e: "쓸지 + 연습용 장갑. 마법 딜러의 폭발력을 높입니다." },
+
+        { q: "물리 피해를 입히면 입힌 피해량의 20%만큼 체력을 회복합니다. 체력이 낮아지면 보호막을 얻습니다.", a: "피바라기", e: "BF대검 + 음전자. 근접 AD 캐리의 생존템입니다." },
+
+        { q: "추가 체력을 얻습니다. 2초마다 주변 적 하나에게 연소 효과를 입혀 체력 비례 고정 피해를 줍니다.", a: "태양불꽃망토", e: "쇠사슬 조끼 + 거인의 허리띠. 치유 감소 효과가 핵심입니다." },
+
+        { q: "방어력이 크게 증가합니다. 받는 치명타 피해를 감소시키고 피격 시 주변 적에게 마법 피해를 입힙니다.", a: "덤불조끼", e: "쇠사슬 조끼 + 쇠사슬 조끼. 물리 방어 특화 아이템입니다." },
+
+        { q: "마법 저항력이 크게 증가합니다. 2초마다 최대 체력의 일정 비율만큼 회복합니다.", a: "용의발톱", e: "음전자 + 음전자. 마법 피해를 견디는 데 최적입니다." },
+
+        { q: "장착 유닛이 14초 동안 군중 제어 효과에 면역이 됩니다.", a: "수은", e: "음전자 + 연습용 장갑. 딜러가 CC기에 걸리는 것을 방지합니다." },
+
+        { q: "3칸 내 적들의 마법 저항력을 30% 감소시킵니다. 적이 스킬 사용 시 마나 비례 피해를 입힙니다.", a: "이온충격기", e: "쓸지 + 음전자. 마법 딜러 덱의 전방 유닛에게 좋습니다." },
+
+        { q: "치명타 확률이 100% 증가하며 추가 치명타 피해량을 얻습니다.", a: "무한의대검", e: "BF대검 + 연습용 장갑. 물리 피해 극대화 아이템입니다." },
+
+        { q: "10초마다 2칸 내 아군들의 체력을 잃은 체력의 15%만큼 회복시키고, 5초 동안 받는 광역 피해를 감소시킵니다.", a: "구원", e: "여눈 + 거인의 허리띠. 아군 유지력을 높여줍니다." },
+
+        { q: "기본 공격 시 대상과 주변 적에게 연쇄 번개를 발사하여 마법 저항력을 감소시킵니다.", a: "스태틱의단검", e: "곡궁 + 여눈. 초반 빌드업과 마저 깎기에 유용합니다." },
+
+        { q: "공격 시 대상에게 추가 물리 피해를 입히고 5초 동안 방어력을 30% 감소시킵니다.", a: "최후의속삭임", e: "곡궁 + 연습용 장갑. 방어력이 높은 적을 상대할 때 필수입니다." },
+
+        { q: "전투 시작 시 장착 유닛과 같은 가로줄 2칸 내 아군들의 공격 속도가 증가합니다.", a: "지크의전령", e: "BF대검 + 거인의 허리띠. 아군 공격 속도 보조 아이템입니다." },
+
+        { q: "체력이 60% 아래로 떨어지면 잠시 은신 상태가 되어 타겟팅에서 벗어나고 능력치를 얻습니다.", a: "밤의끝자락", e: "BF대검 + 쇠사슬 조끼. 생존이 중요한 암살자형 유닛에게 적합합니다." }
+
+    ];
+
+
+
+    let currentIdx = 0;
+
+    let score = 0;
+
+    let isAnswered = false;
+
+
+
+    const effectBox = document.getElementById('effect-box');
+
+    const inputField = document.getElementById('answer-input');
+
+    const actionBtn = document.getElementById('action-btn');
+
+    const feedback = document.getElementById('feedback');
+
+    const statusText = document.getElementById('status-text');
+
+    const expText = document.getElementById('exp-text');
+
+    const progress = document.getElementById('progress');
+
+
+
+    function initQuiz() {
+
+        showQuestion();
+
+    }
+
+
+
+    function showQuestion() {
+
+        isAnswered = false;
+
+        const q = questions[currentIdx];
+
+        progress.innerText = `${currentIdx + 1} / ${questions.length}`;
+
+        effectBox.innerText = q.q;
+
+        inputField.value = '';
+
+        inputField.disabled = false;
+
+        inputField.style.borderColor = "#30363d";
+
+        feedback.style.display = 'none';
+
+        actionBtn.innerText = '제출하기';
+
+        inputField.focus();
+
+    }
+
+
+
+    function handleAction() {
+
+        if (!isAnswered) {
+
+            checkAnswer();
+
+        } else {
+
+            nextQuestion();
+
+        }
+
+    }
+
+
+
+    function checkAnswer() {
+
+        const userVal = inputField.value.trim().replace(/\s/g, '');
+
+        const correctVal = questions[currentIdx].a;
+
+
+
+        isAnswered = true;
+
+        inputField.disabled = true;
+
+        feedback.style.display = 'block';
+
+
+
+        if (userVal === correctVal) {
+
+            statusText.innerText = '정답입니다!';
+
+            statusText.style.color = 'var(--correct)';
+
+            inputField.style.borderColor = 'var(--correct)';
+
+            score++;
+
+        } else {
+
+            statusText.innerText = `오답 (정답: ${correctVal})`;
+
+            statusText.style.color = 'var(--wrong)';
+
+            inputField.style.borderColor = 'var(--wrong)';
+
+        }
+
+
+
+        expText.innerText = questions[currentIdx].e;
+
+        actionBtn.innerText = '다음 문제';
+
+    }
+
+
+
+    function nextQuestion() {
+
+        currentIdx++;
+
+        if (currentIdx < questions.length) {
+
+            showQuestion();
+
+        } else {
+
+            showResult();
+
+        }
+
+    }
+
+
+
+    function showResult() {
+
+        document.getElementById('quiz-screen').classList.add('hidden');
+
+        document.getElementById('result-screen').classList.remove('hidden');
+
+        document.getElementById('score-display').innerText = `${score} / ${questions.length}`;
+
+    }
+
+
+
+    inputField.addEventListener('keypress', (e) => {
+
+        if (e.key === 'Enter') handleAction();
+
+    });
+
+
+
+    initQuiz();
+
+</script>
+
+
+
+</body>
+
+</html>
+
