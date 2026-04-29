@@ -1,0 +1,377 @@
+!DOCTYPE html>
+
+<html lang="ko">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>중3 역사 마스터 퀴즈 📚</title>
+
+    <style>
+
+        :root {
+
+            --primary: #4a69bd;
+
+            --success: #2ecc71;
+
+            --error: #e74c3c;
+
+            --bg: #f8f9fa;
+
+        }
+
+        body {
+
+            font-family: 'Pretendard', sans-serif;
+
+            background-color: var(--bg);
+
+            display: flex;
+
+            justify-content: center;
+
+            align-items: center;
+
+            min-height: 100vh;
+
+            margin: 0;
+
+            padding: 20px;
+
+            box-sizing: border-box;
+
+        }
+
+        #quiz-card {
+
+            background: white;
+
+            width: 100%;
+
+            max-width: 500px;
+
+            border-radius: 20px;
+
+            padding: 30px;
+
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+
+            text-align: center;
+
+        }
+
+        .mascot { font-size: 50px; margin-bottom: 10px; }
+
+        .progress { font-size: 14px; color: #888; margin-bottom: 10px; }
+
+        h2 { font-size: 1.2rem; margin-bottom: 25px; word-break: keep-all; line-height: 1.5; }
+
+        .options { display: grid; gap: 12px; }
+
+        .option-btn {
+
+            padding: 15px;
+
+            border: 2px solid #eee;
+
+            border-radius: 12px;
+
+            background: white;
+
+            cursor: pointer;
+
+            transition: 0.2s;
+
+            font-size: 1rem;
+
+            text-align: left;
+
+        }
+
+        .option-btn.correct { background-color: var(--success); color: white; border-color: var(--success); }
+
+        .option-btn.wrong { background-color: var(--error); color: white; border-color: var(--error); }
+
+        #explanation {
+
+            margin-top: 20px;
+
+            padding: 15px;
+
+            background: #fff9db;
+
+            border-radius: 10px;
+
+            display: none;
+
+            font-size: 0.95rem;
+
+            line-height: 1.5;
+
+            text-align: left;
+
+            border-left: 5px solid #fcc419;
+
+        }
+
+        #next-btn {
+
+            margin-top: 25px;
+
+            width: 100%;
+
+            padding: 15px;
+
+            border: none;
+
+            border-radius: 12px;
+
+            background: var(--primary);
+
+            color: white;
+
+            font-weight: bold;
+
+            display: none;
+
+            cursor: pointer;
+
+            font-size: 1.1rem;
+
+        }
+
+        #result-screen { display: none; }
+
+        .score { font-size: 2.5rem; font-weight: bold; color: var(--primary); margin: 20px 0; }
+
+    </style>
+
+</head>
+
+<body>
+
+
+
+<div id="quiz-card">
+
+    <div id="quiz-screen">
+
+        <div class="mascot">📜🧐</div>
+
+        <div class="progress" id="progress">1 / 15</div>
+
+        <h2 id="question">문제를 불러오는 중...</h2>
+
+        <div class="options" id="options"></div>
+
+        <div id="explanation"></div>
+
+        <button id="next-btn" onclick="nextQuestion()">다음 문제로</button>
+
+    </div>
+
+
+
+    <div id="result-screen">
+
+        <div class="mascot">🎓</div>
+
+        <h1>학습 완료!</h1>
+
+        <div class="score" id="final-score">0 / 15</div>
+
+        <p id="result-comment"></p>
+
+        <button id="next-btn" style="display:block" onclick="location.reload()">다시 풀기</button>
+
+    </div>
+
+</div>
+
+
+
+<script>
+
+    const questions = [
+
+        { q: "흥선대원군이 왕권 강화를 위해 중건하였으나 당백전 발행의 원인이 된 것은?", a: ["창덕궁", "경복궁", "덕수궁", "경희궁"], c: 1, e: "흥선대원군은 임진왜란 때 불탄 경복궁을 중건하여 왕실의 권위를 세우려 했습니다." },
+
+        { q: "1876년 일본과 체결한 최초의 근대적·불평등 조약은?", a: ["조미 수호 통상 조약", "강화도 조약", "한일 의정서", "을사늑약"], c: 1, e: "강화도 조약은 최초의 근대적 조약이지만 해안 측량권 등을 허용한 불평등 조약입니다." },
+
+        { q: "1884년 김옥균 등 급진 개화파가 일으킨 정변은?", a: ["임오군란", "갑오개혁", "갑신정변", "을미사변"], c: 2, e: "갑신정변은 우정총국 개국 축하연을 이용해 일어난 근대 국가 건설 운동입니다." },
+
+        { q: "1894년 반봉건·반외세를 외치며 일어난 대규모 농민 운동은?", a: ["동학 농민 운동", "애국 계몽 운동", "3.1 운동", "신간회 활동"], c: 0, e: "전봉준 등이 이끄는 농민군이 고부 민란을 시작으로 일으킨 대규모 운동입니다." },
+
+        { q: "1897년 고종이 황제 즉위식을 거행하고 선포한 국호는?", a: ["대한민국", "조선민주공화국", "대한제국", "고려"], c: 2, e: "고종은 환구단에서 황제에 즉위하며 대한제국을 선포하여 자주국임을 알렸습니다." },
+
+        { q: "1905년 대한제국의 외교권을 박탈하기 위해 강제로 체결된 조약은?", a: ["한일 합병 조약", "정미 7조약", "을사늑약", "한일 신협약"], c: 2, e: "을사늑약으로 인해 통감부가 설치되고 대한제국의 외교권이 박탈되었습니다." },
+
+        { q: "1909년 하얼빈 역에서 이토 히로부미를 사살한 의사는?", a: ["이봉창", "안중근", "윤봉길", "김상옥"], c: 1, e: "안중근 의사는 동양 평화를 위협하는 침략의 원흉 이토 히로부미를 사살했습니다." },
+
+        { q: "1919년 고종의 인산일을 계기로 전국에서 일어난 만세 운동은?", a: ["6.10 만세 운동", "광주 학생 독립 운동", "3.1 운동", "2.8 독립 선언"], c: 2, e: "3.1 운동은 민족 자결주의의 영향 속에 일어난 최대 규모의 민족 운동입니다." },
+
+        { q: "대한민국 임시 정부의 초대 대통령은?", a: ["김구", "안창호", "이승만", "신채호"], c: 2, e: "대한민국 임시 정부는 대통령 중심제를 채택하고 이승만을 초대 대통령으로 선출했습니다." },
+
+        { q: "1920년 김좌진 장군이 이끄는 북로군정서군 등이 일본군을 대파한 전투는?", a: ["봉오동 전투", "청산리 대첩", "살수 대첩", "귀주 대첩"], c: 1, e: "청산리 대첩은 독립군이 일본군을 상대로 거둔 최대의 승리입니다." },
+
+        { q: "18세기 영국에서 시작되어 생산 방식에 큰 변화를 가져온 사건은?", a: ["프랑스 혁명", "산업 혁명", "명예 혁명", "미국 독립 혁명"], c: 1, e: "산업 혁명은 기계의 발명과 증기 기관의 활용으로 사회 전반을 변화시켰습니다." },
+
+        { q: "제1차 세계 대전의 발발 계기가 된 사건은?", a: ["사라예보 사건", "진주만 습격", "노르망디 상륙 작전", "보스턴 차 사건"], c: 0, e: "오스트리아 황태자 부부가 피살된 사라예보 사건이 대전의 도화선이 되었습니다." },
+
+        { q: "1945년 8월 15일 우리 민족이 일제 식민 지배에서 벗어난 것은?", a: ["제헌절", "광복", "개천절", "삼일절"], c: 1, e: "연합군의 승리와 민족의 투쟁 결과로 광복을 맞이하게 되었습니다." },
+
+        { q: "1960년 3.15 부정 선거에 항거하여 일어난 민주화 혁명은?", a: ["4.19 혁명", "5.18 민주화 운동", "6월 민주 항쟁", "부마 민주 항쟁"], c: 0, e: "4.19 혁명은 학생과 시민이 독재 정권을 무너뜨린 최초의 민주 혁명입니다." },
+
+        { q: "1987년 대통령 직선제 개헌을 이끌어낸 민주화 항쟁은?", a: ["5.18 민주화 운동", "6월 민주 항쟁", "4.19 혁명", "10.26 사태"], c: 1, e: "6월 민주 항쟁의 결과로 6.29 선언이 발표되고 직선제 개헌이 이루어졌습니다." }
+
+    ];
+
+
+
+    let currentIdx = 0;
+
+    let score = 0;
+
+    let answered = false;
+
+
+
+    function loadQuestion() {
+
+        answered = false;
+
+        const qData = questions[currentIdx];
+
+        document.getElementById("progress").innerText = `${currentIdx + 1} / ${questions.length}`;
+
+        document.getElementById("question").innerText = qData.q;
+
+        document.getElementById("explanation").style.display = "none";
+
+        document.getElementById("next-btn").style.display = "none";
+
+        
+
+        const optionsDiv = document.getElementById("options");
+
+        optionsDiv.innerHTML = "";
+
+        
+
+        qData.a.forEach((opt, i) => {
+
+            const btn = document.createElement("button");
+
+            btn.className = "option-btn";
+
+            btn.innerText = opt;
+
+            btn.onclick = () => checkAnswer(i, btn);
+
+            optionsDiv.appendChild(btn);
+
+        });
+
+    }
+
+
+
+    function checkAnswer(idx, btn) {
+
+        if (answered) return;
+
+        answered = true;
+
+        
+
+        const correctIdx = questions[currentIdx].c;
+
+        const allBtns = document.querySelectorAll(".option-btn");
+
+        
+
+        if (idx === correctIdx) {
+
+            btn.classList.add("correct");
+
+            score++;
+
+        } else {
+
+            btn.classList.add("wrong");
+
+            allBtns[correctIdx].classList.add("correct");
+
+        }
+
+        
+
+        document.getElementById("explanation").innerHTML = `<strong>해설:</strong> ${questions[currentIdx].e}`;
+
+        document.getElementById("explanation").style.display = "block";
+
+        document.getElementById("next-btn").style.display = "block";
+
+    }
+
+
+
+    function nextQuestion() {
+
+        currentIdx++;
+
+        if (currentIdx < questions.length) {
+
+            loadQuestion();
+
+        } else {
+
+            showResult();
+
+        }
+
+    }
+
+
+
+    function showResult() {
+
+        document.getElementById("quiz-screen").style.display = "none";
+
+        document.getElementById("result-screen").style.display = "block";
+
+        document.getElementById("final-score").innerText = `${score} / ${questions.length}`;
+
+        
+
+        let comment = "";
+
+        if (score === 15) comment = "역사 천재 등장! 역사 마스터이시네요! 👑";
+
+        else if (score >= 10) comment = "훌륭합니다! 기본기가 아주 탄탄해요! 👍";
+
+        else if (score >= 5) comment = "조금 더 복습하면 완벽해질 거예요! ✨";
+
+        else comment = "괜찮아요, 다시 한 번 훑어볼까요? 📖";
+
+        
+
+        document.getElementById("result-comment").innerText = comment;
+
+    }
+
+
+
+    loadQuestion();
+
+</script>
+
+
+
+</body>
+
+</html>
