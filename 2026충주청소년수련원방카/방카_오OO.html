@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>디저트 퀴즈 🍰</title>
+
+<style>
+
+body {
+
+  font-family: 'Arial', sans-serif;
+
+  background: #fff8f0;
+
+  margin: 0;
+
+  padding: 0;
+
+  text-align: center;
+
+}
+
+.container {
+
+  padding: 20px;
+
+}
+
+h1 {
+
+  font-size: 24px;
+
+}
+
+.mascot {
+
+  font-size: 50px;
+
+}
+
+.question {
+
+  font-size: 18px;
+
+  margin: 20px 0;
+
+}
+
+.choice {
+
+  display: block;
+
+  background: #fff;
+
+  margin: 10px auto;
+
+  padding: 12px;
+
+  border-radius: 10px;
+
+  width: 90%;
+
+  border: 2px solid #ddd;
+
+  cursor: pointer;
+
+}
+
+.choice.correct {
+
+  background: #c8f7c5;
+
+}
+
+.choice.wrong {
+
+  background: #f7c5c5;
+
+}
+
+.explanation {
+
+  margin-top: 15px;
+
+  font-size: 14px;
+
+  color: #555;
+
+}
+
+button {
+
+  margin-top: 20px;
+
+  padding: 10px 20px;
+
+  border: none;
+
+  background: #ffb6c1;
+
+  border-radius: 10px;
+
+  font-size: 16px;
+
+}
+
+.hidden {
+
+  display: none;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="mascot">🧁</div>
+
+  <h1>디저트 퀴즈!</h1>
+
+  <div id="quiz"></div>
+
+  <button id="nextBtn" class="hidden">다음</button>
+
+</div>
+
+
+
+<script>
+
+const quizData = [
+
+  {
+
+    q: "마카롱의 원산지는 어디일까요?",
+
+    choices: ["이탈리아", "프랑스", "스페인", "독일"],
+
+    answer: 0,
+
+    explanation: "마카롱은 이탈리아에서 시작되어 프랑스에서 유명해졌어요!"
+
+  },
+
+  {
+
+    q: "티라미수에 들어가는 치즈는?",
+
+    choices: ["체다치즈", "모짜렐라", "마스카포네", "크림치즈"],
+
+    answer: 2,
+
+    explanation: "티라미수에는 부드러운 마스카포네 치즈가 들어갑니다."
+
+  },
+
+  {
+
+    q: "아이스크림의 주요 재료가 아닌 것은?",
+
+    choices: ["우유", "설탕", "소금", "크림"],
+
+    answer: 2,
+
+    explanation: "소금은 직접 재료가 아니라 온도 조절에 사용되기도 합니다."
+
+  },
+
+  {
+
+    q: "초콜릿의 원료는?",
+
+    choices: ["커피콩", "카카오콩", "바닐라콩", "밀"],
+
+    answer: 1,
+
+    explanation: "초콜릿은 카카오콩으로 만들어집니다."
+
+  },
+
+  {
+
+    q: "크루아상의 특징은?",
+
+    choices: ["바삭한 겹층", "쫀득함", "매운맛", "차가움"],
+
+    answer: 0,
+
+    explanation: "크루아상은 버터로 만든 겹겹의 바삭한 식감이 특징입니다."
+
+  },
+
+  {
+
+    q: "푸딩의 주 재료는?",
+
+    choices: ["젤라틴", "밀가루", "쌀", "감자"],
+
+    answer: 0,
+
+    explanation: "푸딩은 젤라틴이나 계란으로 굳힌 디저트입니다."
+
+  },
+
+  {
+
+    q: "와플의 모양은?",
+
+    choices: ["동그라미", "격자무늬", "삼각형", "별모양"],
+
+    answer: 1,
+
+    explanation: "와플은 격자무늬가 특징입니다."
+
+  },
+
+  {
+
+    q: "파르페는 어느 나라 디저트?",
+
+    choices: ["일본", "프랑스", "미국", "중국"],
+
+    answer: 1,
+
+    explanation: "파르페는 프랑스에서 유래한 디저트입니다."
+
+  },
+
+  {
+
+    q: "브라우니의 특징은?",
+
+    choices: ["바삭함", "촉촉함", "차가움", "시큼함"],
+
+    answer: 1,
+
+    explanation: "브라우니는 촉촉하고 진한 초콜릿 맛이 특징입니다."
+
+  },
+
+  {
+
+    q: "솜사탕은 무엇으로 만들까요?",
+
+    choices: ["설탕", "소금", "밀가루", "버터"],
+
+    answer: 0,
+
+    explanation: "설탕을 녹여서 만든 달콤한 간식입니다."
+
+  }
+
+];
+
+
+
+let current = 0;
+
+let score = 0;
+
+
+
+const quizEl = document.getElementById("quiz");
+
+const nextBtn = document.getElementById("nextBtn");
+
+
+
+function loadQuestion() {
+
+  nextBtn.classList.add("hidden");
+
+  const q = quizData[current];
+
+  quizEl.innerHTML = `
+
+    <div class="question">${current + 1}. ${q.q}</div>
+
+    ${q.choices.map((c, i) => `<div class="choice" onclick="selectAnswer(${i})">${c}</div>`).join("")}
+
+    <div class="explanation hidden" id="exp"></div>
+
+  `;
+
+}
+
+
+
+function selectAnswer(i) {
+
+  const q = quizData[current];
+
+  const choices = document.querySelectorAll(".choice");
+
+  choices.forEach((c, idx) => {
+
+    c.onclick = null;
+
+    if (idx === q.answer) c.classList.add("correct");
+
+    if (idx === i && i !== q.answer) c.classList.add("wrong");
+
+  });
+
+
+
+  if (i === q.answer) score++;
+
+
+
+  const exp = document.getElementById("exp");
+
+  exp.classList.remove("hidden");
+
+  exp.innerText = q.explanation;
+
+
+
+  nextBtn.classList.remove("hidden");
+
+}
+
+
+
+nextBtn.onclick = () => {
+
+  current++;
+
+  if (current < quizData.length) {
+
+    loadQuestion();
+
+  } else {
+
+    showResult();
+
+  }
+
+};
+
+
+
+function showResult() {
+
+  quizEl.innerHTML = `
+
+    <h2>🎉 결과 🎉</h2>
+
+    <p>총 점수: ${score} / ${quizData.length}</p>
+
+    <p>${score >= 8 ? "대단해요! 디저트 마스터! 🍩" : "조금 더 도전해봐요! 🍪"}</p>
+
+  `;
+
+  nextBtn.style.display = "none";
+
+}
+
+
+
+loadQuestion();
+
+</script>
+
+</body>
+
+</html>
+
