@@ -8,7 +8,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>🌸 꽃말 퀴즈 🌸</title>
+<title>문호 스트레이독스 퀴즈 🐯✨</title>
 
 <style>
 
@@ -16,11 +16,11 @@ body {
 
     font-family: 'Arial', sans-serif;
 
+    background: #f5f7fb;
+
     margin: 0;
 
     padding: 0;
-
-    background: #fff5f8;
 
     text-align: center;
 
@@ -28,83 +28,69 @@ body {
 
 .container {
 
+    max-width: 420px;
+
+    margin: auto;
+
     padding: 20px;
 
 }
 
 h1 {
 
-    font-size: 24px;
-
-}
-
-.mascot {
-
-    font-size: 50px;
+    font-size: 22px;
 
 }
 
 .question {
 
-    font-size: 20px;
+    font-size: 18px;
 
     margin: 20px 0;
 
 }
 
-.choice {
+.btn {
 
     display: block;
 
-    padding: 12px;
+    width: 100%;
 
     margin: 8px 0;
+
+    padding: 12px;
 
     border-radius: 10px;
 
     border: none;
 
-    background: #eee;
+    background: #e0e0e0;
 
     font-size: 16px;
 
 }
 
-.choice.correct {
+.correct {
 
-    background: #b2f2bb;
+    background: #4CAF50 !important;
+
+    color: white;
 
 }
 
-.choice.wrong {
+.wrong {
 
-    background: #ffa8a8;
+    background: #F44336 !important;
+
+    color: white;
 
 }
 
 .explanation {
 
-    margin-top: 10px;
-
     font-size: 14px;
 
-}
-
-button {
-
-    padding: 10px 20px;
-
-    margin-top: 20px;
-
-    font-size: 16px;
-
-    border: none;
-
-    border-radius: 10px;
-
-    background: #ff8fab;
-
-    color: white;
+    margin-top: 10px;
 
 }
 
@@ -114,29 +100,29 @@ button {
 
 }
 
+#result {
+
+    font-size: 20px;
+
+    margin-top: 30px;
+
+}
+
 </style>
 
 </head>
 
 <body>
 
-
-
 <div class="container">
 
-    <div class="mascot">🌼🐰</div>
+<h1>문호 스트레이독스 퀴즈 🐯✨</h1>
 
-    <h1>꽃말 맞추기 퀴즈</h1>
+<div id="quiz"></div>
 
-
-
-    <div id="quiz"></div>
-
-    <div id="result" class="hidden"></div>
+<div id="result" class="hidden"></div>
 
 </div>
-
-
 
 <script>
 
@@ -144,169 +130,169 @@ const quizData = [
 
 {
 
-    q: "은방울꽃의 꽃말은?",
+    question: "나카지마 아츠시의 능력은?",
 
-    choices: ["순결", "슬픔", "행복", "질투"],
+    options: ["호랑이 변신", "불 조종", "시간 정지", "독 생성"],
+
+    answer: 0,
+
+    explanation: "아츠시는 하얀 호랑이로 변신하는 능력을 가지고 있어요 🐯"
+
+},
+
+{
+
+    question: "다자이 오사무의 능력은?",
+
+    options: ["능력 무효화", "중력 조종", "환각", "불멸"],
+
+    answer: 0,
+
+    explanation: "다자이는 모든 능력을 무효화합니다."
+
+},
+
+{
+
+    question: "아쿠타가와의 능력 이름은?",
+
+    options: ["라쇼몽", "월광", "빙결", "천둥"],
+
+    answer: 0,
+
+    explanation: "아쿠타가와의 능력은 '라쇼몽'입니다."
+
+},
+
+{
+
+    question: "포트 마피아 간부는 누구?",
+
+    options: ["아츠시", "츄야", "다자이", "후쿠자와"],
+
+    answer: 1,
+
+    explanation: "나카하라 츄야는 포트 마피아 간부입니다."
+
+},
+
+{
+
+    question: "무장 탐정사의 사장은?",
+
+    options: ["다자이", "아쿠타가와", "후쿠자와", "츠지무라"],
 
     answer: 2,
 
-    exp: "은방울꽃은 '행복이 다시 찾아온다'는 의미를 가지고 있어요."
+    explanation: "후쿠자와 유키치는 탐정사의 사장입니다."
 
 },
 
 {
 
-    q: "장미의 꽃말은?",
+    question: "아츠시가 처음 만난 탐정사는?",
 
-    choices: ["사랑", "우정", "희망", "기다림"],
+    options: ["다자이", "쿠니키다", "란포", "요사노"],
 
     answer: 0,
 
-    exp: "장미는 대표적으로 사랑을 의미해요."
+    explanation: "아츠시는 처음에 다자이를 만나게 됩니다."
 
 },
 
 {
 
-    q: "해바라기의 꽃말은?",
+    question: "에도가와 란포의 능력은?",
 
-    choices: ["집착", "숭배", "행복", "희망"],
+    options: ["초추리", "투명화", "시간 이동", "독 생성"],
+
+    answer: 0,
+
+    explanation: "란포는 뛰어난 추리 능력을 가지고 있습니다."
+
+},
+
+{
+
+    question: "요사노 아키코의 능력은?",
+
+    options: ["치유", "불 조종", "빙결", "전기"],
+
+    answer: 0,
+
+    explanation: "요사노는 치유 능력을 가지고 있습니다."
+
+},
+
+{
+
+    question: "다자이가 과거 속했던 조직은?",
+
+    options: ["무장 탐정사", "포트 마피아", "정부", "길드"],
 
     answer: 1,
 
-    exp: "해바라기는 태양을 향하는 모습에서 숭배의 의미가 있어요."
+    explanation: "다자이는 과거 포트 마피아 소속이었습니다."
 
 },
 
 {
 
-    q: "튤립의 꽃말은?",
+    question: "길드의 리더는?",
 
-    choices: ["영원", "사랑의 고백", "희망", "용기"],
-
-    answer: 1,
-
-    exp: "튤립은 사랑을 고백할 때 자주 사용돼요."
-
-},
-
-{
-
-    q: "백합의 꽃말은?",
-
-    choices: ["순결", "질투", "슬픔", "분노"],
+    options: ["피츠제럴드", "츄야", "란포", "아츠시"],
 
     answer: 0,
 
-    exp: "백합은 순수하고 깨끗한 이미지를 상징해요."
-
-},
-
-{
-
-    q: "카네이션의 꽃말은?",
-
-    choices: ["감사", "행복", "질투", "미움"],
-
-    answer: 0,
-
-    exp: "카네이션은 감사의 마음을 표현할 때 사용돼요."
-
-},
-
-{
-
-    q: "라벤더의 꽃말은?",
-
-    choices: ["침묵", "불안", "행복", "질투"],
-
-    answer: 0,
-
-    exp: "라벤더는 침묵과 평온을 의미해요."
-
-},
-
-{
-
-    q: "코스모스의 꽃말은?",
-
-    choices: ["질서", "혼돈", "사랑", "슬픔"],
-
-    answer: 0,
-
-    exp: "코스모스는 조화와 질서를 상징해요."
-
-},
-
-{
-
-    q: "데이지의 꽃말은?",
-
-    choices: ["순수", "슬픔", "질투", "고통"],
-
-    answer: 0,
-
-    exp: "데이지는 순수함과 순결을 의미해요."
-
-},
-
-{
-
-    q: "국화의 꽃말은?",
-
-    choices: ["기쁨", "장수", "질투", "슬픔"],
-
-    answer: 1,
-
-    exp: "국화는 장수와 고귀함을 상징해요."
+    explanation: "프랜시스 피츠제럴드는 길드의 리더입니다."
 
 }
 
 ];
 
-
-
 let current = 0;
 
 let score = 0;
 
-
-
-function loadQuiz() {
+function loadQuestion() {
 
     const q = quizData[current];
 
-    const quizDiv = document.getElementById("quiz");
+    const quiz = document.getElementById("quiz");
 
-    quizDiv.innerHTML = `
+    quiz.innerHTML = `
 
-        <div class="question">${current+1}. ${q.q}</div>
+        <div class="question">${q.question}</div>
 
-        ${q.choices.map((c, i) => `<button class="choice" onclick="checkAnswer(${i})">${c}</button>`).join("")}
+        ${q.options.map((opt, i) => 
 
-        <div id="exp" class="explanation hidden"></div>
+            `<button class="btn" onclick="selectAnswer(${i})">${opt}</button>`
+
+        ).join("")}
+
+        <div id="explanation" class="explanation hidden"></div>
 
     `;
 
 }
 
+function selectAnswer(index) {
 
+    const buttons = document.querySelectorAll(".btn");
 
-function checkAnswer(i) {
+    const correctIndex = quizData[current].answer;
 
-    const q = quizData[current];
+    const explanation = document.getElementById("explanation");
 
-    const buttons = document.querySelectorAll(".choice");
-
-    buttons.forEach((btn, idx) => {
+    buttons.forEach((btn, i) => {
 
         btn.disabled = true;
 
-        if (idx === q.answer) {
+        if (i === correctIndex) {
 
             btn.classList.add("correct");
 
-        } else if (idx === i) {
+        } else if (i === index) {
 
             btn.classList.add("wrong");
 
@@ -314,19 +300,11 @@ function checkAnswer(i) {
 
     });
 
+    if (index === correctIndex) score++;
 
+    explanation.innerText = quizData[current].explanation;
 
-    if (i === q.answer) score++;
-
-
-
-    const expDiv = document.getElementById("exp");
-
-    expDiv.classList.remove("hidden");
-
-    expDiv.innerText = q.exp;
-
-
+    explanation.classList.remove("hidden");
 
     setTimeout(() => {
 
@@ -334,7 +312,7 @@ function checkAnswer(i) {
 
         if (current < quizData.length) {
 
-            loadQuiz();
+            loadQuestion();
 
         } else {
 
@@ -346,18 +324,30 @@ function checkAnswer(i) {
 
 }
 
-
-
 function showResult() {
 
     document.getElementById("quiz").classList.add("hidden");
 
-    const resultDiv = document.getElementById("result");
+    const result = document.getElementById("result");
 
-    resultDiv.classList.remove("hidden");
+    result.classList.remove("hidden");
 
-    resultDiv.innerHTML = `
+    result.innerHTML = `
 
-        <h2>🎉 결과 🎉</h2>
+        🐯✨ 결과 ✨🐯<br><br>
 
-        <p
+        ${score} / ${quizData.length} 점<br><br>
+
+        ${score >= 8 ? "완전 팬 인정!" : "조금 더 도전해봐요!"}
+
+    `;
+
+}
+
+loadQuestion();
+
+</script>
+
+</body>
+
+</html>
