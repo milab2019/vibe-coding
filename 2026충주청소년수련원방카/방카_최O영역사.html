@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>중3 역사 퀴즈 - 고조선부터 발해까지</title>
+
+    <style>
+
+        :root {
+
+            --primary-color: #ff9f43;
+
+            --correct-color: #2ecc71;
+
+            --wrong-color: #e74c3c;
+
+            --bg-color: #f8f9fa;
+
+        }
+
+        body {
+
+            font-family: 'Pretendard', sans-serif;
+
+            background-color: var(--bg-color);
+
+            margin: 0;
+
+            display: flex;
+
+            justify-content: center;
+
+            align-items: center;
+
+            min-height: 100vh;
+
+            padding: 20px;
+
+            box-sizing: border-box;
+
+        }
+
+        #quiz-container {
+
+            background: white;
+
+            width: 100%;
+
+            max-width: 500px;
+
+            border-radius: 20px;
+
+            padding: 25px;
+
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+
+            text-align: center;
+
+        }
+
+        .mascot {
+
+            font-size: 50px;
+
+            margin-bottom: 10px;
+
+        }
+
+        h1 {
+
+            font-size: 1.5rem;
+
+            color: #333;
+
+            margin-bottom: 20px;
+
+        }
+
+        .question {
+
+            font-size: 1.2rem;
+
+            font-weight: bold;
+
+            margin-bottom: 20px;
+
+            word-break: keep-all;
+
+        }
+
+        .options {
+
+            display: grid;
+
+            gap: 10px;
+
+        }
+
+        .option-btn {
+
+            padding: 15px;
+
+            border: 2px solid #eee;
+
+            border-radius: 12px;
+
+            background: white;
+
+            cursor: pointer;
+
+            transition: all 0.2s;
+
+            font-size: 1rem;
+
+            text-align: left;
+
+        }
+
+        .option-btn:hover {
+
+            background-color: #fffaf0;
+
+            border-color: var(--primary-color);
+
+        }
+
+        .option-btn.correct {
+
+            background-color: var(--correct-color);
+
+            color: white;
+
+            border-color: var(--correct-color);
+
+        }
+
+        .option-btn.wrong {
+
+            background-color: var(--wrong-color);
+
+            color: white;
+
+            border-color: var(--wrong-color);
+
+        }
+
+        #explanation {
+
+            margin-top: 20px;
+
+            padding: 15px;
+
+            border-radius: 10px;
+
+            background-color: #f0f7ff;
+
+            display: none;
+
+            text-align: left;
+
+            font-size: 0.9rem;
+
+            line-height: 1.5;
+
+        }
+
+        #next-btn {
+
+            margin-top: 20px;
+
+            width: 100%;
+
+            padding: 15px;
+
+            border: none;
+
+            border-radius: 12px;
+
+            background-color: var(--primary-color);
+
+            color: white;
+
+            font-weight: bold;
+
+            display: none;
+
+            cursor: pointer;
+
+        }
+
+        .result-screen {
+
+            display: none;
+
+        }
+
+        .score-text {
+
+            font-size: 2rem;
+
+            font-weight: bold;
+
+            color: var(--primary-color);
+
+            margin: 20px 0;
+
+        }
+
+        .restart-btn {
+
+            padding: 15px 30px;
+
+            background: #333;
+
+            color: white;
+
+            border-radius: 10px;
+
+            border: none;
+
+            cursor: pointer;
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div id="quiz-container">
+
+    <div class="mascot">🐯</div>
+
+    
+
+    <div id="quiz-screen">
+
+        <div id="progress">1 / 5</div>
+
+        <div class="question" id="question-text">질문 불러오는 중...</div>
+
+        <div class="options" id="options-container"></div>
+
+        <div id="explanation"></div>
+
+        <button id="next-btn" onclick="nextQuestion()">다음 문제로</button>
+
+    </div>
+
+    <div id="result-screen" class="result-screen">
+
+        <h2>시험 끝! 고생했어 어흥!</h2>
+
+        <div class="score-text" id="final-score">0 / 5</div>
+
+        <p id="result-msg"></p>
+
+        <button class="restart-btn" onclick="location.reload()">다시 도전하기</button>
+
+    </div>
+
+</div>
+
+<script>
+
+    const quizData = [
+
+        {
+
+            q: "고조선의 사회상을 알 수 있는 법률로, 살인, 상해, 절도 등의 처벌 규정이 담긴 것은?",
+
+            a: ["4조법", "8조법", "10조법", "경국대전"],
+
+            correct: 1,
+
+            exp: "고조선에는 8개의 조목으로 된 법률(8조법)이 있어 당시의 생명 존중, 노동력 중시, 사유 재산 보호 등의 사회상을 보여줍니다."
+
+        },
+
+        {
+
+            q: "삼국 시대 중 가장 먼저 전성기를 맞이하였으며, 수군을 이끌고 요서 지방까지 진출했던 나라는?",
+
+            a: ["고구려", "신라", "백제", "가야"],
+
+            correct: 2,
+
+            exp: "백제는 4세기 근초고왕 때 가장 먼저 전성기를 맞이하여 요서, 산둥, 규슈 지방까지 진출하며 해상 강국으로 성장했습니다."
+
+        },
+
+        {
+
+            q: "고구려의 전성기를 이끈 왕으로, 신라에 침입한 왜구를 격퇴하고 '광개토대왕릉비'를 남긴 왕은?",
+
+            a: ["장수왕", "소수림왕", "미천왕", "광개토대왕"],
+
+            correct: 3,
+
+            exp: "광개토대왕은 영토를 크게 확장하였으며, 신라 내물왕의 요청으로 보병과 기병 5만을 보내 왜구를 격퇴했습니다."
+
+        },
+
+        {
+
+            q: "신라가 삼국 통일을 달성하는 과정에서 당나라 군대를 격파한 결정적인 전투 두 가지는?",
+
+            a: ["살수 대첩, 안시성 전투", "매소성 전투, 기벌포 전투", "황산벌 전투, 백강 전투", "관산성 전투, 대야성 전투"],
+
+            correct: 1,
+
+            exp: "신라는 매소성 전투(육전)와 기벌포 전투(해전)에서 당나라 군대를 물리치고 대동강에서 원산만까지의 삼국 통일을 완수했습니다."
+
+        },
+
+        {
+
+            q: "고구려 계승 의식을 가졌으며, '해동성국'이라 불릴 만큼 번성했던 나라는?",
+
+            a: ["발해", "통일 신라", "후백제", "부여"],
+
+            correct: 0,
+
+            exp: "대조영이 세운 발해는 고구려를 계승했으며, 9세기 선왕 때 영토가 가장 넓어져 중국으로부터 '해동성국'이라 불렸습니다."
+
+        }
+
+    ];
+
+    let currentIdx = 0;
+
+    let score = 0;
+
+    let answered = false;
+
+    function loadQuestion() {
+
+        answered = false;
+
+        const q = quizData[currentIdx];
+
+        document.getElementById('progress').innerText = `${currentIdx + 1} / ${quizData.length}`;
+
+        document.getElementById('question-text').innerText = q.q;
+
+        document.getElementById('explanation').style.display = 'none';
+
+        document.getElementById('next-btn').style.display = 'none';
+
+        
+
+        const container = document.getElementById('options-container');
+
+        container.innerHTML = '';
+
+        
+
+        q.a.forEach((opt, i) => {
+
+            const btn = document.createElement('button');
+
+            btn.className = 'option-btn';
+
+            btn.innerText = opt;
+
+            btn.onclick = () => checkAnswer(i);
+
+            container.appendChild(btn);
+
+        });
+
+    }
+
+    function checkAnswer(idx) {
+
+        if(answered) return;
+
+        answered = true;
+
+        
+
+        const q = quizData[currentIdx];
+
+        const buttons = document.querySelectorAll('.option-btn');
+
+        const expDiv = document.getElementById('explanation');
+
+        
+
+        if(idx === q.correct) {
+
+            buttons[idx].classList.add('correct');
+
+            score++;
+
+        } else {
+
+            buttons[idx].classList.add('wrong');
+
+            buttons[q.correct].classList.add('correct');
+
+        }
+
+        expDiv.innerText = `💡 해설: ${q.exp}`;
+
+        expDiv.style.display = 'block';
+
+        document.getElementById('next-btn').style.display = 'block';
+
+    }
+
+    function nextQuestion() {
+
+        currentIdx++;
+
+        if(currentIdx < quizData.length) {
+
+            loadQuestion();
+
+        } else {
+
+            showResult();
+
+        }
+
+    }
+
+    function showResult() {
+
+        document.getElementById('quiz-screen').style.display = 'none';
+
+        const resultScreen = document.getElementById('result-screen');
+
+        resultScreen.style.display = 'block';
+
+        document.getElementById('final-score').innerText = `${score} / ${quizData.length}`;
+
+        
+
+        let msg = "";
+
+        if(score === 5) msg = "와우! 역사 마스터시군요! 🐯✨";
+
+        else if(score >= 3) msg = "거의 다 맞혔어요! 조금만 더 하면 완벽해요! 🐯👍";
+
+        else msg = "다시 한번 복습해볼까요? 할 수 있어요! 🐯🐾";
+
+        document.getElementById('result-msg').innerText = msg;
+
+    }
+
+    loadQuestion();
+
+</script>
+
+</body>
+
+</html>
